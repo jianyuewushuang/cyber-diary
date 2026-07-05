@@ -46,7 +46,7 @@
     }
 
     header {
-      padding: 2rem;
+      padding: 1rem 2rem;
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -114,9 +114,9 @@
 
     .tab-content {
       display: none;
-      max-width: 1200px;
+      max-width: 1600px;
       margin: 0 auto;
-      padding: 0 2rem 2rem;
+      padding: 0 1rem 1rem;
     }
 
     .tab-content.active {
@@ -125,14 +125,14 @@
 
     .calendar-layout {
       display: flex;
-      gap: 2rem;
+      gap: 1rem;
       align-items: flex-start;
     }
 
     .calendar-container {
       background: var(--card-bg);
       border-radius: 0;
-      padding: 2rem;
+      padding: 1rem;
       border: 1px solid var(--border-color);
       flex: 1;
       min-width: 0;
@@ -142,7 +142,7 @@
       background: var(--card-bg);
       border-radius: 0;
       border: 1px solid var(--border-color);
-      width: 400px;
+      width: 500px;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
@@ -150,21 +150,21 @@
     }
 
     .diary-detail-header {
-      padding: 1.5rem;
+      padding: 1rem;
       border-bottom: 1px solid var(--border-color);
     }
 
     .diary-detail-header h2 {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--primary-color);
       margin: 0;
     }
 
     .diary-detail-body {
-      padding: 2rem;
+      padding: 1rem;
       overflow-y: auto;
       flex: 1;
-      line-height: 1.8;
+      line-height: 1.6;
     }
 
     .diary-detail-body h1, .diary-detail-body h2, .diary-detail-body h3 {
@@ -317,6 +317,33 @@
     .month-year {
       font-size: 1.5rem;
       font-weight: bold;
+    }
+
+    .year-selector {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .year-select-input, .month-select-input {
+      padding: 0.5rem 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 0;
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .year-select-input:focus, .month-select-input:focus {
+      border-color: var(--primary-color);
+    }
+
+    .year-select-input option, .month-select-input option {
+      background: var(--bg-color);
+      color: var(--text-color);
     }
 
     .calendar-grid {
@@ -776,10 +803,16 @@
     <div class="calendar-layout">
       <div class="calendar-container">
         <div class="calendar-header">
-          <button class="nav-btn" id="prev-month">&lt;</button>
-          <div class="month-year" id="current-month"></div>
-          <button class="nav-btn" id="next-month">&gt;</button>
-        </div>
+        <button class="nav-btn" id="prev-month">&lt;</button>
+        <div class="month-year" id="current-month"></div>
+        <button class="nav-btn" id="next-month">&gt;</button>
+      </div>
+      <div class="year-selector" id="year-selector">
+        <select id="year-select" class="year-select-input">
+        </select>
+        <select id="month-select" class="month-select-input">
+        </select>
+      </div>
         <div class="calendar-grid" id="calendar-grid"></div>
       </div>
       <div class="diary-detail" id="diary-detail">
@@ -857,6 +890,51 @@
 
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
+
+    function initYearSelector() {
+      const yearSelect = document.getElementById('year-select');
+      const monthSelect = document.getElementById('month-select');
+
+      const today = new Date();
+      const years = [...new Set(diaries.map(d => d.year))];
+      years.sort();
+
+      let minYear = today.getFullYear() - 5;
+      let maxYear = today.getFullYear() + 5;
+
+      if (years.length > 0) {
+        minYear = Math.min(minYear, Math.min(...years) - 1);
+        maxYear = Math.max(maxYear, Math.max(...years) + 1);
+      }
+
+      for (let year = minYear; year <= maxYear; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year + '年';
+        yearSelect.appendChild(option);
+      }
+
+      const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+      months.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = month;
+        monthSelect.appendChild(option);
+      });
+
+      yearSelect.value = currentYear;
+      monthSelect.value = currentMonth;
+
+      yearSelect.addEventListener('change', (e) => {
+        currentYear = parseInt(e.target.value);
+        renderCalendar();
+      });
+
+      monthSelect.addEventListener('change', (e) => {
+        currentMonth = parseInt(e.target.value);
+        renderCalendar();
+      });
+    }
 
     function initTabs() {
       const tabs = document.querySelectorAll('.tab-btn');
@@ -946,6 +1024,13 @@
       }
 
       document.getElementById('current-month').textContent = currentYear + '年' + (currentMonth + 1) + '月';
+
+      const yearSelect = document.getElementById('year-select');
+      const monthSelect = document.getElementById('month-select');
+      if (yearSelect && monthSelect) {
+        yearSelect.value = currentYear;
+        monthSelect.value = currentMonth;
+      }
     }
 
     function showDiaryDetail(dateStr) {
@@ -1259,6 +1344,7 @@
     });
 
     initTabs();
+    initYearSelector();
     renderCalendar();
     initSearch();
     initStats();
