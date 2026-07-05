@@ -1090,7 +1090,7 @@
               borderColor: 'rgba(155, 89, 182, 1)',
               backgroundColor: 'rgba(155, 89, 182, 0.2)',
               borderWidth: 2,
-              tension: 0.4,
+              tension: 0,
               fill: true,
               pointRadius: 4,
               pointHoverRadius: 6
@@ -1101,7 +1101,7 @@
               borderColor: 'rgba(139, 92, 246, 1)',
               backgroundColor: 'rgba(139, 92, 246, 0.2)',
               borderWidth: 2,
-              tension: 0.4,
+              tension: 0,
               fill: true,
               pointRadius: 4,
               pointHoverRadius: 6,
@@ -1159,7 +1159,7 @@
               borderColor: 'rgba(155, 89, 182, 1)',
               backgroundColor: 'rgba(155, 89, 182, 0.2)',
               borderWidth: 2,
-              tension: 0.4,
+              tension: 0,
               fill: true,
               pointRadius: 4,
               pointHoverRadius: 6
@@ -1170,7 +1170,7 @@
               borderColor: 'rgba(139, 92, 246, 1)',
               backgroundColor: 'rgba(139, 92, 246, 0.2)',
               borderWidth: 2,
-              tension: 0.4,
+              tension: 0,
               fill: true,
               pointRadius: 4,
               pointHoverRadius: 6,
@@ -1234,7 +1234,7 @@
               data: yearCounts,
               borderColor: 'rgba(155, 89, 182, 1)',
               backgroundColor: 'rgba(155, 89, 182, 0.2)',
-              tension: 0.4,
+              tension: 0,
               fill: true
             },
             {
@@ -1242,7 +1242,7 @@
               data: yearWords,
               borderColor: 'rgba(139, 92, 246, 1)',
               backgroundColor: 'rgba(139, 92, 246, 0.2)',
-              tension: 0.4,
+              tension: 0,
               fill: true,
               yAxisID: 'y1'
             }
@@ -1284,38 +1284,23 @@
       });
 
       const dateLabels = Object.keys(stats.byDate).sort();
-      const dateCounts = dateLabels.map(d => stats.byDate[d].count);
       const dateWords = dateLabels.map(d => stats.byDate[d].words);
 
       new Chart(document.getElementById('daily-chart'), {
         type: 'line',
         data: {
           labels: dateLabels,
-          datasets: [
-            {
-              label: '日记数量',
-              data: dateCounts,
-              borderColor: 'rgba(155, 89, 182, 1)',
-              backgroundColor: 'rgba(155, 89, 182, 0.2)',
-              borderWidth: 2,
-              tension: 0.3,
-              fill: true,
-              pointRadius: 3,
-              pointHoverRadius: 5
-            },
-            {
-              label: '字数',
-              data: dateWords,
-              borderColor: 'rgba(139, 92, 246, 1)',
-              backgroundColor: 'rgba(139, 92, 246, 0.2)',
-              borderWidth: 2,
-              tension: 0.3,
-              fill: true,
-              pointRadius: 3,
-              pointHoverRadius: 5,
-              yAxisID: 'y1'
-            }
-          ]
+          datasets: [{
+            label: '字数',
+            data: dateWords,
+            borderColor: 'rgba(139, 92, 246, 1)',
+            backgroundColor: 'rgba(139, 92, 246, 0.2)',
+            borderWidth: 2,
+            tension: 0,
+            fill: true,
+            pointRadius: 3,
+            pointHoverRadius: 5
+          }]
         },
         options: {
           responsive: true,
@@ -1339,11 +1324,6 @@
             y: {
               ticks: { color: '#888' },
               grid: { color: 'rgba(255, 255, 255, 0.1)' }
-            },
-            y1: {
-              position: 'right',
-              ticks: { color: '#888' },
-              grid: { display: false }
             }
           }
         }
