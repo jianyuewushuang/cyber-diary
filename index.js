@@ -86,6 +86,40 @@ function generateStats(diaries) {
     };
   }
 
+  if (diaries.length > 0) {
+    const firstDate = new Date(diaries[0].dateStr);
+    const lastDate = new Date(diaries[diaries.length - 1].dateStr);
+
+    for (const yearKey of Object.keys(stats.byYear)) {
+      const year = parseInt(yearKey);
+      for (let month = 1; month <= 12; month++) {
+        const monthKey = year + '-' + String(month).padStart(2, '0');
+        if (!stats.byMonth[monthKey]) {
+          stats.byMonth[monthKey] = { count: 0, words: 0 };
+        }
+      }
+    }
+
+    const currentDate = new Date(firstDate);
+    while (currentDate <= lastDate) {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+      const day = currentDate.getDate();
+      const dateKey = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+      const weekKey = getWeekNumber(dateKey);
+
+      if (!stats.byDate[dateKey]) {
+        stats.byDate[dateKey] = { count: 0, words: 0 };
+      }
+
+      if (!stats.byWeek[weekKey]) {
+        stats.byWeek[weekKey] = { count: 0, words: 0 };
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  }
+
   return stats;
 }
 
