@@ -12,7 +12,7 @@ const diaryDir = path.join(__dirname, 'diary');
 const buildDir = path.join(__dirname, 'build');
 
 function parseDateFromFilename(filename) {
-  const match = filename.match(/^(\d{4})(\d{2})(\d{2})\.md$/);
+  let match = filename.match(/^(\d{4})(\d{2})(\d{2})\.md$/);
   if (match) {
     return {
       year: parseInt(match[1]),
@@ -21,6 +21,20 @@ function parseDateFromFilename(filename) {
       dateStr: match[1] + '-' + match[2] + '-' + match[3]
     };
   }
+  
+  match = filename.match(/^(\d{2})(\d{2})(\d{2})\.md$/);
+  if (match) {
+    const year = parseInt('20' + match[1]);
+    const month = parseInt(match[2]);
+    const day = parseInt(match[3]);
+    return {
+      year: year,
+      month: month,
+      day: day,
+      dateStr: '20' + match[1] + '-' + match[2] + '-' + match[3]
+    };
+  }
+  
   return null;
 }
 
