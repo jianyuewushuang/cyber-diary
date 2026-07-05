@@ -35,7 +35,7 @@ function readDiaryFiles() {
       const content = fs.readFileSync(filePath, 'utf-8');
       const htmlContent = md.render(content);
       const wordCount = content.length;
-      const preview = content.substring(0, 100) + (content.length > 100 ? '...' : '');
+      const preview = content.substring(0, 200) + (content.length > 200 ? '...' : '');
 
       diaries.push({
         filename: file,
