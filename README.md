@@ -38,4 +38,4 @@
 npm run build
 ```
 
-预览地址：http://localhost:8085
+预览地址：http://localhost:8085 或 http://127.0.0.1:8085
