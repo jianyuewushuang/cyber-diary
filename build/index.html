@@ -656,18 +656,28 @@
       font-size: 0.9rem;
     }
 
+    .chart-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     .chart-container {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 0;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
+      padding: 1rem;
+      flex: 1;
+      min-width: 0;
     }
 
     .chart-title {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: bold;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
       color: var(--primary-color);
     }
 
@@ -909,21 +919,25 @@
         <div class="stat-label">平均字数</div>
       </div>
     </div>
-    <div class="chart-container">
-      <div class="chart-title">每日字数分布</div>
-      <canvas id="daily-chart"></canvas>
+    <div class="chart-row">
+      <div class="chart-container">
+        <div class="chart-title">每日字数分布</div>
+        <canvas id="daily-chart"></canvas>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">周度日记统计</div>
+        <canvas id="weekly-chart"></canvas>
+      </div>
     </div>
-    <div class="chart-container">
-      <div class="chart-title">周度日记统计</div>
-      <canvas id="weekly-chart"></canvas>
-    </div>
-    <div class="chart-container">
-      <div class="chart-title">月度日记统计</div>
-      <canvas id="monthly-chart"></canvas>
-    </div>
-    <div class="chart-container">
-      <div class="chart-title">年度日记统计</div>
-      <canvas id="yearly-chart"></canvas>
+    <div class="chart-row">
+      <div class="chart-container">
+        <div class="chart-title">月度日记统计</div>
+        <canvas id="monthly-chart"></canvas>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">年度日记统计</div>
+        <canvas id="yearly-chart"></canvas>
+      </div>
     </div>
   </div>
 
