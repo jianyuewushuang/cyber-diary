@@ -1,0 +1,19 @@
+{
+  "name": "cyber-diary",
+  "version": "1.0.0",
+  "description": "赛博日记本 - 可视化日记管理工具",
+  "main": "index.js",
+  "scripts": {
+    "build": "node index.js",
+    "dev": "node index.js && npx http-server build -p 8080"
+  },
+  "keywords": ["diary", "journal", "markdown", "cyber"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "markdown-it": "^14.1.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

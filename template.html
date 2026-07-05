@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛博日记本</title>
+  <style>
+    :root {
+      --primary-color: #9b59b6;
+      --primary-transparent: rgba(155, 89, 182, 0.3);
+      --primary-light: rgba(155, 89, 182, 0.1);
+      --secondary-color: #8e44ad;
+      --accent-color: #bb6bd9;
+      --bg-color: #0a0a0f;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --text-color: #e0e0e0;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, var(--primary-transparent) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    header {
+      padding: 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header-search {
+      width: 300px;
+    }
+
+    .header-search .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--primary-color);
+      background: var(--primary-light);
+    }
+
+    .tab-btn.active {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 2rem;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .calendar-container {
+      background: var(--card-bg);
+      border-radius: 0;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--primary-color);
+      background: var(--primary-light);
+    }
+
+    .month-year {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+    }
+
+    .day-name {
+      text-align: center;
+      padding: 1rem;
+      color: #888;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .day-cell {
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      border-radius: 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      font-size: 0.9rem;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+    }
+
+    .day-number {
+      font-weight: bold;
+      color: var(--text-color);
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .day-cell.has-diary .day-number {
+      color: var(--primary-color);
+    }
+
+    .day-preview {
+      font-size: 0.6rem;
+      color: #888;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      margin-bottom: 4px;
+    }
+
+    .day-wordcount {
+      font-size: 0.65rem;
+      color: var(--primary-color);
+      opacity: 0.8;
+    }
+
+    .day-cell:hover {
+      background: var(--primary-light);
+    }
+
+    .day-cell.other-month {
+      color: #444;
+    }
+
+    .day-cell.has-diary {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .day-cell.has-diary::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      width: var(--circle-size, 12px);
+      height: var(--circle-size, 12px);
+      border-radius: 0;
+      background: var(--primary-color);
+      opacity: 0.8;
+    }
+
+    .day-cell.selected {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .day-cell.selected::after {
+      background: white;
+    }
+
+    .diary-preview {
+      margin-top: 2rem;
+      background: var(--card-bg);
+      border-radius: 0;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .preview-date {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .preview-words {
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    .preview-content {
+      margin-top: 1rem;
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    .preview-content h1, .preview-content h2, .preview-content h3 {
+      color: var(--primary-color);
+      margin: 1rem 0 0.5rem;
+    }
+
+    .preview-content ul, .preview-content ol {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+
+    .preview-content blockquote {
+      border-left: 3px solid var(--primary-color);
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #888;
+    }
+
+    .preview-content code {
+      background: rgba(155, 89, 182, 0.2);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .preview-content pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1rem;
+      border-radius: 0;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .preview-content pre code {
+      background: none;
+      padding: 0;
+    }
+
+    .read-more {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 0;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .read-more:hover {
+      background: var(--secondary-color);
+    }
+
+    .search-container {
+      margin-bottom: 2rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0;
+      color: var(--text-color);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 20px var(--primary-transparent);
+    }
+
+    .search-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .search-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .search-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    .search-date {
+      color: var(--primary-color);
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .search-preview {
+      color: #888;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .chart-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0;
+      max-width: 800px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: none;
+      color: var(--text-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--primary-light);
+    }
+
+    .modal-body {
+      padding: 2rem;
+      line-height: 1.8;
+    }
+
+    .modal-body h1, .modal-body h2, .modal-body h3 {
+      color: var(--primary-color);
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    .modal-body h1:first-child {
+      margin-top: 0;
+    }
+
+    .modal-body ul, .modal-body ol {
+      padding-left: 1.5rem;
+      margin: 0.75rem 0;
+    }
+
+    .modal-body blockquote {
+      border-left: 3px solid var(--primary-color);
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #888;
+      font-style: italic;
+    }
+
+    .modal-body code {
+      background: rgba(155, 89, 182, 0.2);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .modal-body pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.5rem;
+      border-radius: 0;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .modal-body pre code {
+      background: none;
+      padding: 0;
+    }
+
+    .modal-body img {
+      max-width: 100%;
+      border-radius: 0;
+    }
+
+    .modal-body a {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+
+    .modal-body a:hover {
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem;
+      color: #666;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .calendar-grid {
+        gap: 0.25rem;
+      }
+
+      .day-cell {
+        font-size: 0.8rem;
+      }
+
+      .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div>
+        <h1>赛博日记本</h1>
+        <p class="subtitle">Cyber Diary - 你的数字记忆</p>
+      </div>
+      <div class="header-search">
+        <input type="text" class="search-input" id="search-input" placeholder="搜索日记...">
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" data-tab="calendar">日历视图</button>
+    <button class="tab-btn" data-tab="search">搜索日记</button>
+    <button class="tab-btn" data-tab="stats">统计数据</button>
+  </div>
+
+  <div id="calendar-tab" class="tab-content active">
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <button class="nav-btn" id="prev-month">&lt;</button>
+        <div class="month-year" id="current-month"></div>
+        <button class="nav-btn" id="next-month">&gt;</button>
+      </div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+  </div>
+
+  <div id="search-tab" class="tab-content">
+    <div class="search-container">
+      <input type="text" class="search-input" id="search-input" placeholder="搜索日记内容...">
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+
+  <div id="stats-tab" class="tab-content">
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-value" id="total-count">0</div>
+        <div class="stat-label">日记总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="total-words">0</div>
+        <div class="stat-label">总字数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="active-days">0</div>
+        <div class="stat-label">活跃天数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="avg-words">0</div>
+        <div class="stat-label">平均字数</div>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">月度日记统计</div>
+      <canvas id="monthly-chart"></canvas>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">周度日记统计</div>
+      <canvas id="weekly-chart"></canvas>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">年度日记统计</div>
+      <canvas id="yearly-chart"></canvas>
+    </div>
+    <div class="chart-container">
+      <div class="chart-title">每日字数分布</div>
+      <canvas id="daily-chart"></canvas>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="diary-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title"></div>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const diaries = {{DIARIES_DATA}};
+    const stats = {{STATS_DATA}};
+
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+
+    function initTabs() {
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+        });
+      });
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+      dayNames.forEach(name => {
+        const cell = document.createElement('div');
+        cell.className = 'day-name';
+        cell.textContent = name;
+        grid.appendChild(cell);
+      });
+
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const lastDay = new Date(currentYear, currentMonth + 1, 0);
+      const startDay = firstDay.getDay();
+      const totalDays = lastDay.getDate();
+
+      const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+      for (let i = startDay - 1; i >= 0; i--) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell other-month';
+        cell.textContent = prevMonthLastDay - i;
+        grid.appendChild(cell);
+      }
+
+      for (let day = 1; day <= totalDays; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell';
+
+        const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        const diary = diaries.find(d => d.dateStr === dateStr);
+
+        const dayNumber = document.createElement('span');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = day;
+        cell.appendChild(dayNumber);
+
+        if (diary) {
+          cell.classList.add('has-diary');
+          const circleSize = Math.min(12 + diary.wordCount / 50, 24);
+          cell.style.setProperty('--circle-size', circleSize + 'px');
+
+          const preview = document.createElement('div');
+          preview.className = 'day-preview';
+          preview.textContent = diary.preview;
+          cell.appendChild(preview);
+
+          const wordCount = document.createElement('div');
+          wordCount.className = 'day-wordcount';
+          wordCount.textContent = diary.wordCount + '字';
+          cell.appendChild(wordCount);
+        }
+
+        cell.addEventListener('click', () => {
+          document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+          if (diary) {
+            openDiary(dateStr);
+          }
+        });
+
+        grid.appendChild(cell);
+      }
+
+      const remainingCells = 42 - (startDay + totalDays);
+      for (let i = 1; i <= remainingCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell other-month';
+        cell.textContent = i;
+        grid.appendChild(cell);
+      }
+
+      document.getElementById('current-month').textContent = currentYear + '年' + (currentMonth + 1) + '月';
+    }
+
+    function openDiary(dateStr) {
+      const diary = diaries.find(d => d.dateStr === dateStr);
+      if (diary) {
+        document.getElementById('modal-title').textContent = diary.dateStr;
+        document.getElementById('modal-body').innerHTML = diary.htmlContent;
+        document.getElementById('diary-modal').classList.add('active');
+      }
+    }
+
+    function initSearch() {
+      const input = document.getElementById('search-input');
+      const results = document.getElementById('search-results');
+
+      input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        if (!query) {
+          results.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>输入关键词搜索日记</p></div>';
+          return;
+        }
+
+        const filtered = diaries.filter(d => d.content.toLowerCase().includes(query) || d.dateStr.includes(query));
+
+        if (filtered.length === 0) {
+          results.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>没有找到匹配的日记</p></div>';
+        } else {
+          results.innerHTML = filtered.map(d => '<div class="search-card" onclick="openDiary(\'' + d.dateStr + '\')"><div class="search-date">' + d.dateStr + '</div><div class="search-preview">' + d.preview + '</div><div class="preview-words" style="margin-top: 0.5rem;">' + d.wordCount + ' 字</div></div>').join('');
+        }
+      });
+    }
+
+    function initStats() {
+      const totalCount = Object.values(stats.byDate).length;
+      const totalWords = Object.values(stats.byDate).reduce((sum, d) => sum + d.words, 0);
+
+      document.getElementById('total-count').textContent = totalCount;
+      document.getElementById('total-words').textContent = totalWords.toLocaleString();
+      document.getElementById('active-days').textContent = totalCount;
+      document.getElementById('avg-words').textContent = totalCount > 0 ? Math.round(totalWords / totalCount) : 0;
+
+      const monthLabels = Object.keys(stats.byMonth).sort();
+      const monthCounts = monthLabels.map(m => stats.byMonth[m].count);
+      const monthWords = monthLabels.map(m => stats.byMonth[m].words);
+
+      new Chart(document.getElementById('monthly-chart'), {
+        type: 'bar',
+        data: {
+          labels: monthLabels,
+          datasets: [
+            {
+              label: '日记数量',
+              data: monthCounts,
+              backgroundColor: 'rgba(155, 89, 182, 0.6)',
+              borderColor: 'rgba(155, 89, 182, 1)',
+              borderWidth: 1,
+              borderRadius: 8
+            },
+            {
+              label: '字数',
+              data: monthWords,
+              backgroundColor: 'rgba(139, 92, 246, 0.4)',
+              borderColor: 'rgba(139, 92, 246, 1)',
+              borderWidth: 1,
+              borderRadius: 8,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const month = monthLabels[index];
+              const monthDiaries = diaries.filter(d => d.dateStr.startsWith(month));
+              if (monthDiaries.length > 0) {
+                openDiary(monthDiaries[0].dateStr);
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#e0e0e0' }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#888' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      const weekLabels = Object.keys(stats.byWeek).sort();
+      const weekCounts = weekLabels.map(w => stats.byWeek[w].count);
+      const weekWords = weekLabels.map(w => stats.byWeek[w].words);
+
+      new Chart(document.getElementById('weekly-chart'), {
+        type: 'bar',
+        data: {
+          labels: weekLabels,
+          datasets: [
+            {
+              label: '日记数量',
+              data: weekCounts,
+              backgroundColor: 'rgba(155, 89, 182, 0.6)',
+              borderColor: 'rgba(155, 89, 182, 1)',
+              borderWidth: 1,
+              borderRadius: 8
+            },
+            {
+              label: '字数',
+              data: weekWords,
+              backgroundColor: 'rgba(139, 92, 246, 0.4)',
+              borderColor: 'rgba(139, 92, 246, 1)',
+              borderWidth: 1,
+              borderRadius: 8,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const week = weekLabels[index];
+              const year = week.split('-')[0];
+              const weekNum = parseInt(week.split('W')[1]);
+              const startDate = new Date(year, 0, 1 + (weekNum - 1) * 7);
+              const endDate = new Date(year, 0, 1 + weekNum * 7);
+              const weekDiaries = diaries.filter(d => {
+                const dDate = new Date(d.dateStr);
+                return dDate >= startDate && dDate < endDate;
+              });
+              if (weekDiaries.length > 0) {
+                openDiary(weekDiaries[0].dateStr);
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#e0e0e0' }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888', maxRotation: 45, minRotation: 45 },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#888' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      const yearLabels = Object.keys(stats.byYear).sort();
+      const yearCounts = yearLabels.map(y => stats.byYear[y].count);
+      const yearWords = yearLabels.map(y => stats.byYear[y].words);
+
+      new Chart(document.getElementById('yearly-chart'), {
+        type: 'line',
+        data: {
+          labels: yearLabels,
+          datasets: [
+            {
+              label: '日记数量',
+              data: yearCounts,
+              borderColor: 'rgba(155, 89, 182, 1)',
+              backgroundColor: 'rgba(155, 89, 182, 0.2)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: '字数',
+              data: yearWords,
+              borderColor: 'rgba(139, 92, 246, 1)',
+              backgroundColor: 'rgba(139, 92, 246, 0.2)',
+              tension: 0.4,
+              fill: true,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const year = yearLabels[index];
+              const yearDiaries = diaries.filter(d => d.dateStr.startsWith(year));
+              if (yearDiaries.length > 0) {
+                openDiary(yearDiaries[0].dateStr);
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#e0e0e0' }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#888' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      const dateLabels = diaries.map(d => d.dateStr);
+      const dateWords = diaries.map(d => d.wordCount);
+
+      new Chart(document.getElementById('daily-chart'), {
+        type: 'line',
+        data: {
+          labels: dateLabels,
+          datasets: [{
+            label: '字数',
+            data: dateWords,
+            borderColor: 'rgba(155, 89, 182, 1)',
+            backgroundColor: 'rgba(155, 89, 182, 0.1)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const dateStr = dateLabels[index];
+              openDiary(dateStr);
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#e0e0e0' }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888', maxRotation: 45, minRotation: 45 },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            }
+          }
+        }
+      });
+    }
+
+    document.getElementById('prev-month').addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById('next-month').addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('diary-modal').classList.remove('active');
+    });
+
+    document.getElementById('diary-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('diary-modal')) {
+        document.getElementById('diary-modal').classList.remove('active');
+      }
+    });
+
+    initTabs();
+    renderCalendar();
+    initSearch();
+    initStats();
+  </script>
+</body>
+</html>
