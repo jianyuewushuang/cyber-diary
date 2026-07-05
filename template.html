@@ -123,11 +123,163 @@
       display: block;
     }
 
+    .calendar-layout {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
     .calendar-container {
       background: var(--card-bg);
       border-radius: 0;
       padding: 2rem;
       border: 1px solid var(--border-color);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .diary-detail {
+      background: var(--card-bg);
+      border-radius: 0;
+      border: 1px solid var(--border-color);
+      width: 400px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 200px);
+    }
+
+    .diary-detail-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .diary-detail-header h2 {
+      font-size: 1.2rem;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    .diary-detail-body {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+      line-height: 1.8;
+    }
+
+    .diary-detail-body h1, .diary-detail-body h2, .diary-detail-body h3 {
+      color: var(--primary-color);
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    .diary-detail-body h1:first-child {
+      margin-top: 0;
+    }
+
+    .diary-detail-body ul, .diary-detail-body ol {
+      padding-left: 1.5rem;
+      margin: 0.75rem 0;
+    }
+
+    .diary-detail-body blockquote {
+      border-left: 3px solid var(--primary-color);
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #888;
+      font-style: italic;
+    }
+
+    .diary-detail-body code {
+      background: rgba(155, 89, 182, 0.2);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .diary-detail-body pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.5rem;
+      border-radius: 0;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .diary-detail-body pre code {
+      background: none;
+      padding: 0;
+    }
+
+    .diary-detail-body img {
+      max-width: 100%;
+      border-radius: 0;
+    }
+
+    .diary-detail-body a {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+
+    .diary-detail-body a:hover {
+      text-decoration: underline;
+    }
+
+    .detail-date {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-words {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-content {
+      color: #ccc;
+    }
+
+    .detail-content h1, .detail-content h2, .detail-content h3 {
+      color: var(--primary-color);
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    .detail-content h1:first-child {
+      margin-top: 0;
+    }
+
+    .detail-content ul, .detail-content ol {
+      padding-left: 1.5rem;
+      margin: 0.75rem 0;
+    }
+
+    .detail-content blockquote {
+      border-left: 3px solid var(--primary-color);
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #888;
+      font-style: italic;
+    }
+
+    .detail-content code {
+      background: rgba(155, 89, 182, 0.2);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .detail-content pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.5rem;
+      border-radius: 0;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .detail-content pre code {
+      background: none;
+      padding: 0;
     }
 
     .calendar-header {
@@ -243,8 +395,8 @@
       content: '';
       position: absolute;
       bottom: 8px;
-      width: var(--circle-size, 12px);
-      height: var(--circle-size, 12px);
+      width: var(--circle-size, 8px);
+      height: var(--circle-size, 8px);
       border-radius: 0;
       background: var(--primary-color);
       opacity: 0.8;
@@ -589,6 +741,15 @@
       .stats-container {
         grid-template-columns: repeat(2, 1fr);
       }
+
+      .calendar-layout {
+        flex-direction: column;
+      }
+
+      .diary-detail {
+        width: 100%;
+        max-height: 50vh;
+      }
     }
   </style>
 </head>
@@ -612,13 +773,26 @@
   </div>
 
   <div id="calendar-tab" class="tab-content active">
-    <div class="calendar-container">
-      <div class="calendar-header">
-        <button class="nav-btn" id="prev-month">&lt;</button>
-        <div class="month-year" id="current-month"></div>
-        <button class="nav-btn" id="next-month">&gt;</button>
+    <div class="calendar-layout">
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <button class="nav-btn" id="prev-month">&lt;</button>
+          <div class="month-year" id="current-month"></div>
+          <button class="nav-btn" id="next-month">&gt;</button>
+        </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
       </div>
-      <div class="calendar-grid" id="calendar-grid"></div>
+      <div class="diary-detail" id="diary-detail">
+        <div class="diary-detail-header">
+          <h2>日记详情</h2>
+        </div>
+        <div class="diary-detail-body" id="diary-detail-body">
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <p>点击日历上的日期查看日记全文</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -735,7 +909,7 @@
 
         if (diary) {
           cell.classList.add('has-diary');
-          const circleSize = Math.min(12 + diary.wordCount / 50, 24);
+          const circleSize = Math.min(6 + diary.wordCount / 20, 40);
           cell.style.setProperty('--circle-size', circleSize + 'px');
 
           const preview = document.createElement('div');
@@ -753,7 +927,10 @@
           document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
           cell.classList.add('selected');
           if (diary) {
-            openDiary(dateStr);
+            showDiaryDetail(dateStr);
+          } else {
+            const detailBody = document.getElementById('diary-detail-body');
+            detailBody.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>这一天没有日记</p></div>';
           }
         });
 
@@ -771,13 +948,16 @@
       document.getElementById('current-month').textContent = currentYear + '年' + (currentMonth + 1) + '月';
     }
 
-    function openDiary(dateStr) {
+    function showDiaryDetail(dateStr) {
       const diary = diaries.find(d => d.dateStr === dateStr);
       if (diary) {
-        document.getElementById('modal-title').textContent = diary.dateStr;
-        document.getElementById('modal-body').innerHTML = diary.htmlContent;
-        document.getElementById('diary-modal').classList.add('active');
+        const detailBody = document.getElementById('diary-detail-body');
+        detailBody.innerHTML = '<div class="detail-date">' + diary.dateStr + '</div><div class="detail-words">共 ' + diary.wordCount + ' 字</div><div class="detail-content">' + diary.htmlContent + '</div>';
       }
+    }
+
+    function openDiary(dateStr) {
+      showDiaryDetail(dateStr);
     }
 
     function initSearch() {
