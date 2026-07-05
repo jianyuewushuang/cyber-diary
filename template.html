@@ -660,9 +660,6 @@
       display: flex;
       gap: 1rem;
       margin-bottom: 1rem;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
     }
 
     .chart-container {
@@ -1226,11 +1223,15 @@
           plugins: {
             legend: {
               labels: { color: '#e0e0e0' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
             }
           },
           scales: {
             x: {
-              ticks: { color: '#888' },
+              ticks: { color: '#888', maxRotation: 45, minRotation: 45 },
               grid: { color: 'rgba(255, 255, 255, 0.1)' }
             },
             y: {
@@ -1302,6 +1303,10 @@
           plugins: {
             legend: {
               labels: { color: '#e0e0e0' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
             }
           },
           scales: {
@@ -1365,11 +1370,15 @@
           plugins: {
             legend: {
               labels: { color: '#e0e0e0' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
             }
           },
           scales: {
             x: {
-              ticks: { color: '#888' },
+              ticks: { color: '#888', maxRotation: 45, minRotation: 45 },
               grid: { color: 'rgba(255, 255, 255, 0.1)' }
             },
             y: {
@@ -1416,6 +1425,10 @@
           plugins: {
             legend: {
               labels: { color: '#e0e0e0' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
             }
           },
           scales: {
