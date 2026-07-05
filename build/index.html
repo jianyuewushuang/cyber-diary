@@ -68,6 +68,56 @@
       font-size: 0.9rem;
     }
 
+    .header-search {
+      position: relative;
+    }
+
+    .header-search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-top: none;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+
+    .header-search-results.show {
+      display: block;
+    }
+
+    .header-search-results .search-card {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .header-search-results .search-card:last-child {
+      border-bottom: none;
+    }
+
+    .header-search-results .search-card:hover {
+      background: var(--primary-light);
+    }
+
+    .header-search-results .search-date {
+      font-size: 0.8rem;
+      color: var(--primary-color);
+      margin-bottom: 0.25rem;
+    }
+
+    .header-search-results .search-preview {
+      font-size: 0.8rem;
+      color: var(--text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     h1 {
       font-size: 2.5rem;
       background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
@@ -788,7 +838,8 @@
         <p class="subtitle">Cyber Diary - 你的数字记忆</p>
       </div>
       <div class="header-search">
-        <input type="text" class="search-input" id="search-input" placeholder="搜索日记...">
+        <input type="text" class="search-input" id="header-search-input" placeholder="搜索日记...">
+        <div class="header-search-results" id="header-search-results"></div>
       </div>
     </div>
   </header>
@@ -1042,6 +1093,10 @@
     }
 
     function openDiary(dateStr) {
+      const calendarTab = document.querySelector('.tab-btn[data-tab="calendar"]');
+      if (calendarTab && !calendarTab.classList.contains('active')) {
+        calendarTab.click();
+      }
       showDiaryDetail(dateStr);
     }
 
@@ -1062,6 +1117,36 @@
           results.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>没有找到匹配的日记</p></div>';
         } else {
           results.innerHTML = filtered.map(d => '<div class="search-card" onclick="openDiary(\'' + d.dateStr + '\')"><div class="search-date">' + d.dateStr + '</div><div class="search-preview">' + d.preview + '</div><div class="preview-words" style="margin-top: 0.5rem;">' + d.wordCount + ' 字</div></div>').join('');
+        }
+      });
+    }
+
+    function initHeaderSearch() {
+      const input = document.getElementById('header-search-input');
+      const results = document.getElementById('header-search-results');
+
+      input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        if (!query) {
+          results.classList.remove('show');
+          results.innerHTML = '';
+          return;
+        }
+
+        const filtered = diaries.filter(d => d.content.toLowerCase().includes(query) || d.dateStr.includes(query));
+
+        if (filtered.length === 0) {
+          results.innerHTML = '<div class="search-card" style="color: #888;">没有找到匹配的日记</div>';
+          results.classList.add('show');
+        } else {
+          results.innerHTML = filtered.map(d => '<div class="search-card" onclick="openDiary(\'' + d.dateStr + '\')"><div class="search-date">' + d.dateStr + '</div><div class="search-preview">' + d.preview + '</div></div>').join('');
+          results.classList.add('show');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+          results.classList.remove('show');
         }
       });
     }
@@ -1362,6 +1447,7 @@
     initYearSelector();
     renderCalendar();
     initSearch();
+    initHeaderSearch();
     initStats();
   </script>
 </body>
