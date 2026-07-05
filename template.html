@@ -1080,25 +1080,31 @@
       const monthWords = monthLabels.map(m => stats.byMonth[m].words);
 
       new Chart(document.getElementById('monthly-chart'), {
-        type: 'bar',
+        type: 'line',
         data: {
           labels: monthLabels,
           datasets: [
             {
               label: '日记数量',
               data: monthCounts,
-              backgroundColor: 'rgba(155, 89, 182, 0.6)',
               borderColor: 'rgba(155, 89, 182, 1)',
-              borderWidth: 1,
-              borderRadius: 8
+              backgroundColor: 'rgba(155, 89, 182, 0.2)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6
             },
             {
               label: '字数',
               data: monthWords,
-              backgroundColor: 'rgba(139, 92, 246, 0.4)',
               borderColor: 'rgba(139, 92, 246, 1)',
-              borderWidth: 1,
-              borderRadius: 8,
+              backgroundColor: 'rgba(139, 92, 246, 0.2)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6,
               yAxisID: 'y1'
             }
           ]
@@ -1143,25 +1149,31 @@
       const weekWords = weekLabels.map(w => stats.byWeek[w].words);
 
       new Chart(document.getElementById('weekly-chart'), {
-        type: 'bar',
+        type: 'line',
         data: {
           labels: weekLabels,
           datasets: [
             {
               label: '日记数量',
               data: weekCounts,
-              backgroundColor: 'rgba(155, 89, 182, 0.6)',
               borderColor: 'rgba(155, 89, 182, 1)',
-              borderWidth: 1,
-              borderRadius: 8
+              backgroundColor: 'rgba(155, 89, 182, 0.2)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6
             },
             {
               label: '字数',
               data: weekWords,
-              backgroundColor: 'rgba(139, 92, 246, 0.4)',
               borderColor: 'rgba(139, 92, 246, 1)',
-              borderWidth: 1,
-              borderRadius: 8,
+              backgroundColor: 'rgba(139, 92, 246, 0.2)',
+              borderWidth: 2,
+              tension: 0.4,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6,
               yAxisID: 'y1'
             }
           ]
@@ -1271,21 +1283,39 @@
         }
       });
 
-      const dateLabels = diaries.map(d => d.dateStr);
-      const dateWords = diaries.map(d => d.wordCount);
+      const dateLabels = Object.keys(stats.byDate).sort();
+      const dateCounts = dateLabels.map(d => stats.byDate[d].count);
+      const dateWords = dateLabels.map(d => stats.byDate[d].words);
 
       new Chart(document.getElementById('daily-chart'), {
         type: 'line',
         data: {
           labels: dateLabels,
-          datasets: [{
-            label: '字数',
-            data: dateWords,
-            borderColor: 'rgba(155, 89, 182, 1)',
-            backgroundColor: 'rgba(155, 89, 182, 0.1)',
-            tension: 0.3,
-            fill: true
-          }]
+          datasets: [
+            {
+              label: '日记数量',
+              data: dateCounts,
+              borderColor: 'rgba(155, 89, 182, 1)',
+              backgroundColor: 'rgba(155, 89, 182, 0.2)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true,
+              pointRadius: 3,
+              pointHoverRadius: 5
+            },
+            {
+              label: '字数',
+              data: dateWords,
+              borderColor: 'rgba(139, 92, 246, 1)',
+              backgroundColor: 'rgba(139, 92, 246, 0.2)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+              yAxisID: 'y1'
+            }
+          ]
         },
         options: {
           responsive: true,
@@ -1309,6 +1339,11 @@
             y: {
               ticks: { color: '#888' },
               grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#888' },
+              grid: { display: false }
             }
           }
         }
