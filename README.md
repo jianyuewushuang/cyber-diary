@@ -97,10 +97,10 @@ npm run dev
 或手动启动：
 
 ```bash
-npx http-server build -p 8081
+npx http-server build -p 8080
 ```
 
-然后在浏览器访问：`http://localhost:8081` 或 `http://127.0.0.1:8081`
+然后在浏览器访问：`http://localhost:8080` 或 `http://127.0.0.1:8080`
 
 **方式二：直接打开文件**
 
