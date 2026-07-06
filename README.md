@@ -2,11 +2,11 @@
 
 一个可视化日记管理工具，将本地 Markdown 格式的日记文件转换为精美的网页，支持日历视图、搜索和数据统计功能。
 
-[日历视图](../cyber-diary/source/1.webp)
+![日历视图](./source/1.webp)
 
-[搜索](../cyber-diary/source/2.webp)
+![搜索](./source/2.webp)
 
-[数据统计](../cyber-diary/source/3.webp)
+![数据统计](./source/3.webp)
 
 ---
 
