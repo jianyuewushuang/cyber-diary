@@ -682,11 +682,33 @@
       position: relative;
     }
 
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
     .chart-title {
       font-size: 1rem;
       font-weight: bold;
-      margin-bottom: 0.75rem;
       color: var(--primary-color);
+    }
+
+    .chart-toggle-btn {
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .chart-toggle-btn:hover {
+      border-color: var(--primary-color);
+      background: var(--primary-light);
     }
 
     .modal-overlay {
@@ -929,13 +951,19 @@
     </div>
     <div class="chart-row">
       <div class="chart-container">
-        <div class="chart-title">每日字数分布</div>
+        <div class="chart-header">
+          <div class="chart-title">每日字数分布</div>
+          <button class="chart-toggle-btn" id="toggle-daily" data-show-all="false" onclick="toggleChartRange('daily')">显示全部</button>
+        </div>
         <div class="chart-wrapper">
           <canvas id="daily-chart"></canvas>
         </div>
       </div>
       <div class="chart-container">
-        <div class="chart-title">周度日记统计</div>
+        <div class="chart-header">
+          <div class="chart-title">周度日记统计</div>
+          <button class="chart-toggle-btn" id="toggle-weekly" data-show-all="false" onclick="toggleChartRange('weekly')">显示全部</button>
+        </div>
         <div class="chart-wrapper">
           <canvas id="weekly-chart"></canvas>
         </div>
@@ -943,13 +971,19 @@
     </div>
     <div class="chart-row">
       <div class="chart-container">
-        <div class="chart-title">月度日记统计</div>
+        <div class="chart-header">
+          <div class="chart-title">月度日记统计</div>
+          <button class="chart-toggle-btn" id="toggle-monthly" data-show-all="false" onclick="toggleChartRange('monthly')">显示全部</button>
+        </div>
         <div class="chart-wrapper">
           <canvas id="monthly-chart"></canvas>
         </div>
       </div>
       <div class="chart-container">
-        <div class="chart-title">年度日记统计</div>
+        <div class="chart-header">
+          <div class="chart-title">年度日记统计</div>
+          <button class="chart-toggle-btn" id="toggle-yearly" data-show-all="false" onclick="toggleChartRange('yearly')">显示全部</button>
+        </div>
         <div class="chart-wrapper">
           <canvas id="yearly-chart"></canvas>
         </div>
@@ -974,6 +1008,12 @@
 
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
+
+    let monthlyChart, weeklyChart, yearlyChart, dailyChart;
+    let fullMonthLabels, fullMonthCounts, fullMonthWords;
+    let fullWeekLabels, fullWeekCounts, fullWeekWords;
+    let fullYearLabels, fullYearCounts, fullYearWords;
+    let fullDateLabels, fullDateWords;
 
     function initYearSelector() {
       const yearSelect = document.getElementById('year-select');
@@ -1193,11 +1233,15 @@
       document.getElementById('active-days').textContent = totalCount;
       document.getElementById('avg-words').textContent = totalCount > 0 ? Math.round(totalWords / totalCount) : 0;
 
-      const monthLabels = Object.keys(stats.byMonth).sort().slice(-60);
+      fullMonthLabels = Object.keys(stats.byMonth).sort();
+      fullMonthCounts = fullMonthLabels.map(m => stats.byMonth[m].count);
+      fullMonthWords = fullMonthLabels.map(m => stats.byMonth[m].words);
+
+      const monthLabels = fullMonthLabels.slice(-60);
       const monthCounts = monthLabels.map(m => stats.byMonth[m].count);
       const monthWords = monthLabels.map(m => stats.byMonth[m].words);
 
-      new Chart(document.getElementById('monthly-chart'), {
+      monthlyChart = new Chart(document.getElementById('monthly-chart'), {
         type: 'line',
         data: {
           labels: monthLabels,
@@ -1233,7 +1277,7 @@
           onClick: (event, elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
-              const month = monthLabels[index];
+              const month = event.chart.data.labels[index];
               const monthDiaries = diaries.filter(d => d.dateStr.startsWith(month));
               if (monthDiaries.length > 0) {
                 openDiary(monthDiaries[0].dateStr);
@@ -1267,11 +1311,15 @@
         }
       });
 
-      const weekLabels = Object.keys(stats.byWeek).sort().slice(-60);
+      fullWeekLabels = Object.keys(stats.byWeek).sort();
+      fullWeekCounts = fullWeekLabels.map(w => stats.byWeek[w].count);
+      fullWeekWords = fullWeekLabels.map(w => stats.byWeek[w].words);
+
+      const weekLabels = fullWeekLabels.slice(-60);
       const weekCounts = weekLabels.map(w => stats.byWeek[w].count);
       const weekWords = weekLabels.map(w => stats.byWeek[w].words);
 
-      new Chart(document.getElementById('weekly-chart'), {
+      weeklyChart = new Chart(document.getElementById('weekly-chart'), {
         type: 'line',
         data: {
           labels: weekLabels,
@@ -1307,7 +1355,7 @@
           onClick: (event, elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
-              const week = weekLabels[index];
+              const week = event.chart.data.labels[index];
               const year = week.split('-')[0];
               const weekNum = parseInt(week.split('W')[1]);
               const startDate = new Date(year, 0, 1 + (weekNum - 1) * 7);
@@ -1348,11 +1396,15 @@
         }
       });
 
-      const yearLabels = Object.keys(stats.byYear).sort().slice(-60);
+      fullYearLabels = Object.keys(stats.byYear).sort();
+      fullYearCounts = fullYearLabels.map(y => stats.byYear[y].count);
+      fullYearWords = fullYearLabels.map(y => stats.byYear[y].words);
+
+      const yearLabels = fullYearLabels.slice(-60);
       const yearCounts = yearLabels.map(y => stats.byYear[y].count);
       const yearWords = yearLabels.map(y => stats.byYear[y].words);
 
-      new Chart(document.getElementById('yearly-chart'), {
+      yearlyChart = new Chart(document.getElementById('yearly-chart'), {
         type: 'line',
         data: {
           labels: yearLabels,
@@ -1382,7 +1434,7 @@
           onClick: (event, elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
-              const year = yearLabels[index];
+              const year = event.chart.data.labels[index];
               const yearDiaries = diaries.filter(d => d.dateStr.startsWith(year));
               if (yearDiaries.length > 0) {
                 openDiary(yearDiaries[0].dateStr);
@@ -1416,10 +1468,13 @@
         }
       });
 
-      const dateLabels = Object.keys(stats.byDate).sort().slice(-60);
+      fullDateLabels = Object.keys(stats.byDate).sort();
+      fullDateWords = fullDateLabels.map(d => stats.byDate[d].words);
+
+      const dateLabels = fullDateLabels.slice(-60);
       const dateWords = dateLabels.map(d => stats.byDate[d].words);
 
-      new Chart(document.getElementById('daily-chart'), {
+      dailyChart = new Chart(document.getElementById('daily-chart'), {
         type: 'line',
         data: {
           labels: dateLabels,
@@ -1441,7 +1496,7 @@
           onClick: (event, elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
-              const dateStr = dateLabels[index];
+              const dateStr = event.chart.data.labels[index];
               openDiary(dateStr);
             }
           },
@@ -1466,6 +1521,46 @@
           }
         }
       });
+    }
+
+    function toggleChartRange(chartType) {
+      const btn = document.getElementById('toggle-' + chartType);
+      const showAll = btn.dataset.showAll === 'true';
+      
+      if (chartType === 'monthly') {
+        const labels = showAll ? fullMonthLabels.slice(-60) : fullMonthLabels;
+        const counts = labels.map(m => stats.byMonth[m].count);
+        const words = labels.map(m => stats.byMonth[m].words);
+        monthlyChart.data.labels = labels;
+        monthlyChart.data.datasets[0].data = counts;
+        monthlyChart.data.datasets[1].data = words;
+        monthlyChart.update();
+      } else if (chartType === 'weekly') {
+        const labels = showAll ? fullWeekLabels.slice(-60) : fullWeekLabels;
+        const counts = labels.map(w => stats.byWeek[w].count);
+        const words = labels.map(w => stats.byWeek[w].words);
+        weeklyChart.data.labels = labels;
+        weeklyChart.data.datasets[0].data = counts;
+        weeklyChart.data.datasets[1].data = words;
+        weeklyChart.update();
+      } else if (chartType === 'yearly') {
+        const labels = showAll ? fullYearLabels.slice(-60) : fullYearLabels;
+        const counts = labels.map(y => stats.byYear[y].count);
+        const words = labels.map(y => stats.byYear[y].words);
+        yearlyChart.data.labels = labels;
+        yearlyChart.data.datasets[0].data = counts;
+        yearlyChart.data.datasets[1].data = words;
+        yearlyChart.update();
+      } else if (chartType === 'daily') {
+        const labels = showAll ? fullDateLabels.slice(-60) : fullDateLabels;
+        const words = labels.map(d => stats.byDate[d].words);
+        dailyChart.data.labels = labels;
+        dailyChart.data.datasets[0].data = words;
+        dailyChart.update();
+      }
+      
+      btn.dataset.showAll = !showAll;
+      btn.textContent = showAll ? '显示全部' : '最近60个';
     }
 
     document.getElementById('prev-month').addEventListener('click', () => {
