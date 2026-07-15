@@ -1193,7 +1193,7 @@
       document.getElementById('active-days').textContent = totalCount;
       document.getElementById('avg-words').textContent = totalCount > 0 ? Math.round(totalWords / totalCount) : 0;
 
-      const monthLabels = Object.keys(stats.byMonth).sort();
+      const monthLabels = Object.keys(stats.byMonth).sort().slice(-60);
       const monthCounts = monthLabels.map(m => stats.byMonth[m].count);
       const monthWords = monthLabels.map(m => stats.byMonth[m].words);
 
@@ -1267,7 +1267,7 @@
         }
       });
 
-      const weekLabels = Object.keys(stats.byWeek).sort();
+      const weekLabels = Object.keys(stats.byWeek).sort().slice(-60);
       const weekCounts = weekLabels.map(w => stats.byWeek[w].count);
       const weekWords = weekLabels.map(w => stats.byWeek[w].words);
 
@@ -1348,7 +1348,7 @@
         }
       });
 
-      const yearLabels = Object.keys(stats.byYear).sort();
+      const yearLabels = Object.keys(stats.byYear).sort().slice(-60);
       const yearCounts = yearLabels.map(y => stats.byYear[y].count);
       const yearWords = yearLabels.map(y => stats.byYear[y].words);
 
@@ -1416,7 +1416,7 @@
         }
       });
 
-      const dateLabels = Object.keys(stats.byDate).sort();
+      const dateLabels = Object.keys(stats.byDate).sort().slice(-60);
       const dateWords = dateLabels.map(d => stats.byDate[d].words);
 
       new Chart(document.getElementById('daily-chart'), {
