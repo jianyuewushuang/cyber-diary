@@ -156,6 +156,21 @@ function generateHTML(diaries, stats) {
   return template;
 }
 
+function copyResources() {
+  const resourcesDir = path.join(__dirname, 'resources');
+  const buildResourcesDir = path.join(buildDir, 'resources');
+
+  if (fs.existsSync(resourcesDir)) {
+    if (fs.existsSync(buildResourcesDir)) {
+      fs.rmSync(buildResourcesDir, { recursive: true });
+    }
+    fs.cpSync(resourcesDir, buildResourcesDir, { recursive: true });
+    console.log('resources 文件夹已复制到 build 目录');
+  } else {
+    console.log('resources 文件夹不存在');
+  }
+}
+
 function main() {
   if (!fs.existsSync(diaryDir)) {
     console.log('diary 文件夹不存在，正在创建...');
@@ -175,6 +190,8 @@ function main() {
 
   fs.writeFileSync(path.join(buildDir, 'index.html'), html);
   console.log('HTML 文件已生成到 build 文件夹');
+
+  copyResources();
 }
 
 main();
