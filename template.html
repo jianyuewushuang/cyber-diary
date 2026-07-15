@@ -80,7 +80,7 @@
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-top: none;
-      max-height: 1000px;
+      max-height: 90vh;
       overflow-y: auto;
       z-index: 1000;
       display: none;
@@ -187,7 +187,7 @@
       border-radius: 0;
       padding: 1rem;
       border: 1px solid var(--border-color);
-      flex: 1;
+      max-height: calc(100vh - 248px);
       min-width: 0;
     }
 
@@ -199,7 +199,7 @@
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
-      max-height: calc(100vh - 200px);
+      max-height: calc(100vh - 248px);
     }
 
     .diary-detail-header {
@@ -414,7 +414,7 @@
     }
 
     .day-cell {
-      min-height: 120px;
+      min-height: 77px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -642,13 +642,14 @@
       border-radius: 0;
       padding: 1.5rem;
       text-align: center;
+      max-height: 90px;
     }
 
     .stat-value {
-      font-size: 2rem;
+      font-size: 1.4rem;
       font-weight: bold;
       color: var(--primary-color);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
 
     .stat-label {
@@ -669,6 +670,7 @@
       padding: 1rem;
       flex: 1;
       min-width: 0;
+      max-height: 450px;
     }
 
     .chart-title {
