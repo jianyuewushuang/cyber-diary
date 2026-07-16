@@ -701,6 +701,8 @@ body.theme-21th {
       font-size: 0.65rem;
       color: var(--t-accent);
       font-weight: 600;
+      position: relative;
+      z-index: 1;
     }
 
     .day-cell:hover {
@@ -720,10 +722,11 @@ body.theme-21th {
       content: '';
       position: absolute;
       bottom: 8px;
+      right: 8px;
       width: var(--circle-size, 8px);
       height: var(--circle-size, 8px);
       background: var(--t-accent);
-      opacity: 0.4;
+      opacity: 0.6;
     }
 
     body.theme-21th .day-cell.has-diary::after {
