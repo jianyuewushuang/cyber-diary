@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛博日记本</title>
+  <style id="theme-vars">
+:root {
+  /* Colors — Light mode (21th) */
+  --t-bg: #c5c9c9;
+  --t-card: #d8dada;
+  --t-popover: #d8dada;
+  --t-muted: #d8dada;
+  --t-foreground: #111111;
+  --t-card-foreground: #111111;
+  --t-popover-foreground: #111111;
+  --t-primary: #111111;
+  --t-primary-foreground: #ffffff;
+  --t-secondary: #111111;
+  --t-secondary-foreground: #ffffff;
+  --t-accent: #0040ff;
+  --t-accent-foreground: #ffffff;
+  --t-muted-foreground: #888888;
+  --t-input: #ffffff;
+  --t-ring: #000000;
+  --t-border: #ffffff;
+  --t-destructive: #d73333;
+  --t-destructive-foreground: #ffffff;
+
+  /* Chart colors */
+  --t-chart-1: #0140ff;
+  --t-chart-2: #386aff;
+  --t-chart-3: #6b90ff;
+  --t-chart-4: #94afff;
+  --t-chart-5: #bdcdff;
+  --t-chart-1-alpha: rgba(1, 64, 255, 0.15);
+  --t-chart-2-alpha: rgba(56, 106, 255, 0.15);
+  --t-grid: rgba(0, 0, 0, 0.1);
+
+  /* Typography */
+  --t-font-sans: 'Geist', ui-sans-serif, sans-serif, system-ui;
+  --t-font-serif: 'Geist', ui-sans-serif, sans-serif, system-ui;
+  --t-font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  /* Shape */
+  --t-radius: 0px;
+
+  /* Shadow — hard offset */
+  --t-shadow-xs: 2px 2px 0px rgba(0, 0, 0, 0.5);
+  --t-shadow-sm: 2px 2px 0px rgba(0, 0, 0, 1);
+  --t-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+  --t-shadow-md: 2px 2px 0px rgba(0, 0, 0, 1);
+  --t-shadow-lg: 2px 2px 0px rgba(0, 0, 0, 1);
+  --t-shadow-xl: 2px 2px 0px rgba(0, 0, 0, 1);
+
+  /* Spacing */
+  --t-spacing: 4px;
+}
+
+/* Dark mode */
+.dark {
+  --t-bg: #0a0a0a;
+  --t-foreground: #ffffff;
+  --t-card: #1a1a1a;
+  --t-card-foreground: #ffffff;
+  --t-popover: #1a1a1a;
+  --t-popover-foreground: #ffffff;
+  --t-primary: #ffffff;
+  --t-primary-foreground: #000000;
+  --t-secondary: #333333;
+  --t-secondary-foreground: #ffffff;
+  --t-muted: #333333;
+  --t-muted-foreground: #aaaaaa;
+  --t-accent: #222222;
+  --t-accent-foreground: #ffffff;
+  --t-destructive: #ef4444;
+  --t-destructive-foreground: #ffffff;
+  --t-border: #333333;
+  --t-input: #1a1a1a;
+  --t-ring: #333333;
+  --t-chart-1: #60a5fa;
+  --t-chart-2: #f472b6;
+  --t-chart-3: #34d399;
+  --t-chart-4: #fbbf24;
+  --t-chart-5: #818cf8;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-foreground: var(--t-foreground);
+    --color-card: var(--t-card);
+    --color-card-foreground: var(--t-card-foreground);
+    --color-popover: var(--t-popover);
+    --color-popover-foreground: var(--t-popover-foreground);
+    --color-primary: var(--t-primary);
+    --color-primary-foreground: var(--t-primary-foreground);
+    --color-secondary: var(--t-secondary);
+    --color-secondary-foreground: var(--t-secondary-foreground);
+    --color-muted: var(--t-muted);
+    --color-muted-foreground: var(--t-muted-foreground);
+    --color-accent: var(--t-accent);
+    --color-accent-foreground: var(--t-accent-foreground);
+    --color-destructive: var(--t-destructive);
+    --color-destructive-foreground: var(--t-destructive-foreground);
+    --color-border: var(--t-border);
+    --color-input: var(--t-input);
+    --color-ring: var(--t-ring);
+    --color-chart-1: var(--t-chart-1);
+    --color-chart-2: var(--t-chart-2);
+    --color-chart-3: var(--t-chart-3);
+    --color-chart-4: var(--t-chart-4);
+    --color-chart-5: var(--t-chart-5);
+  }
+  @layer base {
+    body { background: var(--t-background); color: var(--t-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+    <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--t-font-mono) !important;
+      background: var(--t-bg) !important;
+      color: var(--t-foreground);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 16px 32px;
+      border-bottom: 2px solid var(--t-foreground);
+      background: var(--t-card);
+      box-shadow: var(--t-shadow);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .header-search {
+      width: 300px;
+      position: relative;
+    }
+
+    .header-search .search-input {
+      width: 100%;
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      font-family: var(--t-font-mono);
+      background: var(--t-input);
+      border: 2px solid var(--t-foreground);
+      color: var(--t-foreground);
+      outline: none;
+      box-shadow: var(--t-shadow-xs);
+    }
+
+    .header-search .search-input:focus {
+      border-color: var(--t-accent);
+    }
+
+    .header-search .search-input::placeholder {
+      color: var(--t-muted-foreground);
+    }
+
+    .header-search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--t-card);
+      border: 2px solid var(--t-foreground);
+      border-top: none;
+      max-height: 90vh;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      box-shadow: var(--t-shadow);
+    }
+
+    .header-search-results.show {
+      display: block;
+    }
+
+    .header-search-results .search-card {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--t-border);
+      cursor: pointer;
+    }
+
+    .header-search-results .search-card:last-child {
+      border-bottom: none;
+    }
+
+    .header-search-results .search-card:hover {
+      background: var(--t-muted);
+    }
+
+    .header-search-results .search-date {
+      font-size: 0.8rem;
+      color: var(--t-accent);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .header-search-results .search-preview {
+      font-size: 0.8rem;
+      color: var(--t-foreground);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      line-height: 1.4;
+    }
+
+    h1 {
+      font-family: var(--t-font-mono);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--t-primary);
+      text-wrap: balance;
+      word-break: keep-all;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--t-muted-foreground);
+      font-size: 0.85rem;
+      font-family: var(--t-font-mono);
+    }
+
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 24px 16px 16px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .tab-btn {
+      padding: 8px 24px;
+      border: 2px solid var(--t-foreground);
+      background: var(--t-card);
+      color: var(--t-foreground);
+      cursor: pointer;
+      font-family: var(--t-font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: background 120ms cubic-bezier(.2,.8,.2,1), color 120ms cubic-bezier(.2,.8,.2,1);
+      box-shadow: var(--t-shadow-xs);
+    }
+
+    .tab-btn:hover {
+      background: var(--t-muted);
+    }
+
+    .tab-btn.active {
+      background: var(--t-primary);
+      border-color: var(--t-primary);
+      color: var(--t-primary-foreground);
+    }
+
+    .tab-content {
+      display: none;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 16px 16px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .calendar-layout {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .calendar-container {
+      background: var(--t-card);
+      padding: 16px;
+      border: 2px solid var(--t-foreground);
+      height: calc(100vh - 248px);
+      min-width: 0;
+      box-shadow: var(--t-shadow);
+      flex: 1;
+    }
+
+    .diary-detail {
+      background: var(--t-card);
+      border: 2px solid var(--t-foreground);
+      width: 500px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 248px);
+      box-shadow: var(--t-shadow);
+    }
+
+    .diary-detail-header {
+      padding: 16px;
+      border-bottom: 2px solid var(--t-foreground);
+    }
+
+    .diary-detail-header h2 {
+      font-family: var(--t-font-mono);
+      font-size: 1rem;
+      color: var(--t-primary);
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .diary-detail-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      line-height: 1.6;
+      font-size: 0.9rem;
+    }
+
+    .diary-detail-body h1 { font-size: 1.8rem; font-weight: 700; color: var(--t-primary); margin: 24px 0 12px; font-family: var(--t-font-mono); }
+    .diary-detail-body h2 { font-size: 1.5rem; font-weight: 700; color: var(--t-primary); margin: 24px 0 12px; font-family: var(--t-font-mono); }
+    .diary-detail-body h3 { font-size: 1.3rem; font-weight: 700; color: var(--t-primary); margin: 24px 0 12px; font-family: var(--t-font-mono); }
+    .diary-detail-body h4 { font-size: 1.1rem; font-weight: 700; color: var(--t-primary); margin: 20px 0 10px; font-family: var(--t-font-mono); }
+    .diary-detail-body h5 { font-size: 1rem; font-weight: 700; color: var(--t-primary); margin: 16px 0 8px; font-family: var(--t-font-mono); }
+    .diary-detail-body h6 { font-size: 0.9rem; font-weight: 600; color: var(--t-primary); margin: 12px 0 6px; font-family: var(--t-font-mono); }
+
+    .diary-detail-body h1:first-child, .diary-detail-body h2:first-child, .diary-detail-body h3:first-child {
+      margin-top: 0;
+    }
+
+    .diary-detail-body ul, .diary-detail-body ol {
+      padding-left: 28px;
+      margin: 16px 0;
+    }
+
+    .diary-detail-body li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .diary-detail-body ul li {
+      list-style-type: disc;
+    }
+
+    .diary-detail-body ol li {
+      list-style-type: decimal;
+    }
+
+    .diary-detail-body blockquote {
+      border-left: 3px solid var(--t-accent);
+      padding-left: 16px;
+      margin: 16px 0;
+      color: var(--t-muted-foreground);
+      font-style: italic;
+    }
+
+    .diary-detail-body code {
+      background: var(--t-muted);
+      padding: 2px 6px;
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+    }
+
+    .diary-detail-body pre {
+      background: var(--t-foreground);
+      color: var(--t-card);
+      padding: 16px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+    }
+
+    .diary-detail-body pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .diary-detail-body img {
+      max-width: 100%;
+    }
+
+    .diary-detail-body a {
+      color: var(--t-accent);
+      text-decoration: none;
+    }
+
+    .diary-detail-body a:hover {
+      text-decoration: underline;
+    }
+
+    .detail-date {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--t-accent);
+      margin-bottom: 8px;
+      font-family: var(--t-font-mono);
+    }
+
+    .detail-words {
+      font-size: 0.85rem;
+      color: var(--t-muted-foreground);
+      margin-bottom: 24px;
+      font-family: var(--t-font-mono);
+    }
+
+    .detail-content {
+      color: var(--t-foreground);
+    }
+
+    .detail-content h1 { font-size: 1.8rem; font-weight: 700; color: var(--t-primary); margin: 24px 0 12px; }
+    .detail-content h2 { font-size: 1.5rem; font-weight: 700; color: var(--t-primary); margin: 24px 0 12px; }
+    .detail-content h3 { font-size: 1.3rem; font-weight: 700; color: var(--t-primary); margin: 24px 0 12px; }
+    .detail-content h4 { font-size: 1.1rem; font-weight: 700; color: var(--t-primary); margin: 20px 0 10px; }
+    .detail-content h5 { font-size: 1rem; font-weight: 700; color: var(--t-primary); margin: 16px 0 8px; }
+    .detail-content h6 { font-size: 0.9rem; font-weight: 600; color: var(--t-primary); margin: 12px 0 6px; }
+
+    .detail-content h1:first-child, .detail-content h2:first-child, .detail-content h3:first-child {
+      margin-top: 0;
+    }
+
+    .detail-content ul, .detail-content ol {
+      padding-left: 28px;
+      margin: 16px 0;
+    }
+
+    .detail-content li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .detail-content ul li {
+      list-style-type: disc;
+    }
+
+    .detail-content ol li {
+      list-style-type: decimal;
+    }
+
+    .detail-content blockquote {
+      border-left: 3px solid var(--t-accent);
+      padding-left: 16px;
+      margin: 16px 0;
+      color: var(--t-muted-foreground);
+      font-style: italic;
+    }
+
+    .detail-content code {
+      background: var(--t-muted);
+      padding: 2px 6px;
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+    }
+
+    .detail-content pre {
+      background: var(--t-foreground);
+      color: var(--t-card);
+      padding: 16px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+    }
+
+    .detail-content pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--t-foreground);
+      background: var(--t-card);
+      color: var(--t-foreground);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-family: var(--t-font-mono);
+      transition: background 120ms cubic-bezier(.2,.8,.2,1);
+      box-shadow: var(--t-shadow-xs);
+    }
+
+    .nav-btn:hover {
+      background: var(--t-muted);
+    }
+
+    .month-year {
+      font-family: var(--t-font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--t-primary);
+    }
+
+    .year-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .year-select-input, .month-select-input {
+      padding: 8px 16px;
+      background: var(--t-input);
+      border: 2px solid var(--t-foreground);
+      color: var(--t-foreground);
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      box-shadow: var(--t-shadow-xs);
+    }
+
+    .year-select-input:focus, .month-select-input:focus {
+      border-color: var(--t-accent);
+    }
+
+    .year-select-input option, .month-select-input option {
+      background: var(--t-card);
+      color: var(--t-foreground);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .day-name {
+      text-align: center;
+      padding: 8px;
+      color: var(--t-muted-foreground);
+      font-weight: 700;
+      font-size: 0.8rem;
+      font-family: var(--t-font-mono);
+    }
+
+    .day-cell {
+      height: calc((100vh - 440px)/6);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      cursor: pointer;
+      transition: background 120ms cubic-bezier(.2,.8,.2,1);
+      position: relative;
+      font-size: 0.85rem;
+      padding: 8px;
+      border: 1px solid var(--t-border);
+      background: var(--t-input);
+    }
+
+    .day-number {
+      font-weight: 700;
+      color: var(--t-foreground);
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .day-cell.has-diary .day-number {
+      color: var(--t-accent);
+    }
+
+    .day-preview {
+      font-size: 0.65rem;
+      color: var(--t-muted-foreground);
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      margin-bottom: 4px;
+    }
+
+    .day-wordcount {
+      font-size: 0.65rem;
+      color: var(--t-accent);
+      font-weight: 600;
+    }
+
+    .day-cell:hover {
+      background: var(--t-card);
+    }
+
+    .day-cell.other-month {
+      color: var(--t-muted-foreground);
+      opacity: 0.5;
+    }
+
+    .day-cell.has-diary {
+      border-color: var(--t-accent);
+    }
+
+    .day-cell.has-diary::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      width: var(--circle-size, 8px);
+      height: var(--circle-size, 8px);
+      background: var(--t-accent);
+    }
+
+    .day-cell.selected {
+      background: var(--t-primary);
+      color: var(--t-primary-foreground);
+    }
+
+    .day-cell.selected .day-number {
+      color: var(--t-primary-foreground);
+    }
+
+    .day-cell.selected .day-preview {
+      color: var(--t-primary-foreground);
+    }
+
+    .day-cell.selected .day-wordcount {
+      color: var(--t-primary-foreground);
+    }
+
+    .day-cell.selected::after {
+      background: var(--t-accent);
+    }
+
+    .read-more {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 8px 16px;
+      background: var(--t-primary);
+      color: var(--t-primary-foreground);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 2px solid var(--t-foreground);
+      transition: background 120ms cubic-bezier(.2,.8,.2,1);
+      box-shadow: var(--t-shadow-xs);
+    }
+
+    .read-more:hover {
+      background: var(--t-accent);
+      color: var(--t-accent-foreground);
+    }
+
+    .search-container {
+      margin-bottom: 24px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--t-input);
+      border: 2px solid var(--t-foreground);
+      color: var(--t-foreground);
+      font-family: var(--t-font-mono);
+      font-size: 1rem;
+      outline: none;
+      box-shadow: var(--t-shadow);
+    }
+
+    .search-input:focus {
+      border-color: var(--t-accent);
+    }
+
+    .search-input::placeholder {
+      color: var(--t-muted-foreground);
+    }
+
+    .search-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .search-card {
+      background: var(--t-card);
+      border: 2px solid var(--t-foreground);
+      padding: 16px;
+      cursor: pointer;
+      transition: transform 120ms cubic-bezier(.2,.8,.2,1);
+      box-shadow: var(--t-shadow-sm);
+    }
+
+    .search-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .search-date {
+      color: var(--t-accent);
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-family: var(--t-font-mono);
+    }
+
+    .search-preview {
+      color: var(--t-foreground);
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--t-card);
+      border: 2px solid var(--t-foreground);
+      padding: 16px;
+      text-align: center;
+      box-shadow: var(--t-shadow-sm);
+    }
+
+    .stat-value {
+      font-family: var(--t-font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--t-primary);
+      margin-bottom: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      color: var(--t-muted-foreground);
+      font-size: 0.85rem;
+      font-family: var(--t-font-mono);
+    }
+
+    .chart-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      background: var(--t-card);
+      border: 2px solid var(--t-foreground);
+      padding: 16px;
+      flex: 1;
+      min-width: 0;
+      height: 310px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--t-shadow-sm);
+    }
+
+    .chart-wrapper {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .chart-title {
+      font-family: var(--t-font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--t-primary);
+    }
+
+    .chart-toggle-btn {
+      padding: 4px 12px;
+      border: 2px solid var(--t-foreground);
+      background: var(--t-card);
+      color: var(--t-foreground);
+      cursor: pointer;
+      font-family: var(--t-font-mono);
+      font-size: 0.75rem;
+      transition: background 120ms cubic-bezier(.2,.8,.2,1);
+      box-shadow: var(--t-shadow-xs);
+    }
+
+    .chart-toggle-btn:hover {
+      background: var(--t-muted);
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 32px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--t-card);
+      border: 2px solid var(--t-foreground);
+      max-width: 800px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: var(--t-shadow-lg);
+    }
+
+    .modal-header {
+      padding: 16px;
+      border-bottom: 2px solid var(--t-foreground);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-family: var(--t-font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--t-primary);
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--t-foreground);
+      background: var(--t-card);
+      color: var(--t-foreground);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--t-font-mono);
+      transition: background 120ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    .modal-close:hover {
+      background: var(--t-muted);
+    }
+
+    .modal-body {
+      padding: 24px;
+      line-height: 1.8;
+      color: var(--t-foreground);
+      font-size: 0.9rem;
+    }
+
+    .modal-body h1, .modal-body h2, .modal-body h3 {
+      color: var(--t-primary);
+      margin: 24px 0 12px;
+      font-family: var(--t-font-mono);
+    }
+
+    .modal-body h1:first-child {
+      margin-top: 0;
+    }
+
+    .modal-body ul, .modal-body ol {
+      padding-left: 24px;
+      margin: 12px 0;
+    }
+
+    .modal-body blockquote {
+      border-left: 3px solid var(--t-accent);
+      padding-left: 16px;
+      margin: 16px 0;
+      color: var(--t-muted-foreground);
+      font-style: italic;
+    }
+
+    .modal-body code {
+      background: var(--t-muted);
+      padding: 2px 6px;
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+    }
+
+    .modal-body pre {
+      background: var(--t-foreground);
+      color: var(--t-card);
+      padding: 16px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-family: var(--t-font-mono);
+      font-size: 0.85rem;
+    }
+
+    .modal-body pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .modal-body img {
+      max-width: 100%;
+    }
+
+    .modal-body a {
+      color: var(--t-accent);
+      text-decoration: none;
+    }
+
+    .modal-body a:hover {
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--t-muted-foreground);
+      font-family: var(--t-font-mono);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 1.5rem; }
+      .calendar-grid { gap: 2px; }
+      .day-cell { font-size: 0.75rem; }
+      .stats-container { grid-template-columns: repeat(2, 1fr); }
+      .calendar-layout { flex-direction: column; }
+      .diary-detail { width: 100%; max-height: 50vh; }
+      .chart-row { flex-direction: column; }
+      .header-content { flex-direction: column; gap: 12px; }
+      .header-search { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div>
+        <h1>赛博日记本</h1>
+        <p class="subtitle">Cyber Diary - 你的数字记忆</p>
+      </div>
+      <div class="header-search">
+        <input type="text" class="search-input" id="header-search-input" placeholder="搜索日记...">
+        <div class="header-search-results" id="header-search-results"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" data-tab="calendar">日历视图</button>
+    <button class="tab-btn" data-tab="search">搜索日记</button>
+    <button class="tab-btn" data-tab="stats">统计数据</button>
+  </div>
+
+  <div id="calendar-tab" class="tab-content active">
+    <div class="calendar-layout">
+      <div class="calendar-container">
+        <div class="calendar-header">
+        <button class="nav-btn" id="prev-month">&lt;</button>
+        <div class="month-year" id="current-month"></div>
+        <button class="nav-btn" id="next-month">&gt;</button>
+      </div>
+      <div class="year-selector" id="year-selector">
+        <select id="year-select" class="year-select-input">
+        </select>
+        <select id="month-select" class="month-select-input">
+        </select>
+      </div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+      <div class="diary-detail" id="diary-detail">
+        <div class="diary-detail-header">
+          <h2>日记详情</h2>
+        </div>
+        <div class="diary-detail-body" id="diary-detail-body">
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <p>点击日历上的日期查看日记全文</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="search-tab" class="tab-content">
+    <div class="search-container">
+      <input type="text" class="search-input" id="search-input" placeholder="搜索日记内容...">
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+
+  <div id="stats-tab" class="tab-content">
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-value" id="total-count">0</div>
+        <div class="stat-label">日记总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="total-words">0</div>
+        <div class="stat-label">总字数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="active-days">0</div>
+        <div class="stat-label">活跃天数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="avg-words">0</div>
+        <div class="stat-label">平均字数</div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">每日字数分布</div>
+          <button class="chart-toggle-btn" id="toggle-daily" data-show-all="false" onclick="toggleChartRange('daily')">显示全部</button>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="daily-chart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">周度日记统计</div>
+          <button class="chart-toggle-btn" id="toggle-weekly" data-show-all="false" onclick="toggleChartRange('weekly')">显示全部</button>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="weekly-chart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">月度日记统计</div>
+          <button class="chart-toggle-btn" id="toggle-monthly" data-show-all="false" onclick="toggleChartRange('monthly')">显示全部</button>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="monthly-chart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">年度日记统计</div>
+          <button class="chart-toggle-btn" id="toggle-yearly" data-show-all="false" onclick="toggleChartRange('yearly')">显示全部</button>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="yearly-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="diary-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title"></div>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const diaries = {{DIARIES_DATA}};
+    const stats = {{STATS_DATA}};
+
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+
+    let monthlyChart, weeklyChart, yearlyChart, dailyChart;
+    let fullMonthLabels, fullMonthCounts, fullMonthWords;
+    let fullWeekLabels, fullWeekCounts, fullWeekWords;
+    let fullYearLabels, fullYearCounts, fullYearWords;
+    let fullDateLabels, fullDateWords;
+
+    function initYearSelector() {
+      const yearSelect = document.getElementById('year-select');
+      const monthSelect = document.getElementById('month-select');
+
+      const today = new Date();
+      const years = [...new Set(diaries.map(d => d.year))];
+      years.sort();
+
+      let minYear = today.getFullYear() - 5;
+      let maxYear = today.getFullYear() + 5;
+
+      if (years.length > 0) {
+        minYear = Math.min(minYear, Math.min(...years) - 1);
+        maxYear = Math.max(maxYear, Math.max(...years) + 1);
+      }
+
+      for (let year = minYear; year <= maxYear; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year + '年';
+        yearSelect.appendChild(option);
+      }
+
+      const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+      months.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = month;
+        monthSelect.appendChild(option);
+      });
+
+      yearSelect.value = currentYear;
+      monthSelect.value = currentMonth;
+
+      yearSelect.addEventListener('change', (e) => {
+        currentYear = parseInt(e.target.value);
+        renderCalendar();
+      });
+
+      monthSelect.addEventListener('change', (e) => {
+        currentMonth = parseInt(e.target.value);
+        renderCalendar();
+      });
+    }
+
+    function initTabs() {
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+        });
+      });
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+      dayNames.forEach(name => {
+        const cell = document.createElement('div');
+        cell.className = 'day-name';
+        cell.textContent = name;
+        grid.appendChild(cell);
+      });
+
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const lastDay = new Date(currentYear, currentMonth + 1, 0);
+      const startDay = firstDay.getDay();
+      const totalDays = lastDay.getDate();
+
+      const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+      for (let i = startDay - 1; i >= 0; i--) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell other-month';
+        cell.textContent = prevMonthLastDay - i;
+        grid.appendChild(cell);
+      }
+
+      for (let day = 1; day <= totalDays; day++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell';
+
+        const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+        const diary = diaries.find(d => d.dateStr === dateStr);
+
+        const dayNumber = document.createElement('span');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = day;
+        cell.appendChild(dayNumber);
+
+        if (diary) {
+          cell.classList.add('has-diary');
+          const circleSize = Math.min(6 + diary.wordCount / 20, 40);
+          cell.style.setProperty('--circle-size', circleSize + 'px');
+
+          const preview = document.createElement('div');
+          preview.className = 'day-preview';
+          preview.textContent = diary.preview;
+          cell.appendChild(preview);
+
+          const wordCount = document.createElement('div');
+          wordCount.className = 'day-wordcount';
+          wordCount.textContent = diary.wordCount + '字';
+          cell.appendChild(wordCount);
+        }
+
+        cell.addEventListener('click', () => {
+          document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+          if (diary) {
+            showDiaryDetail(dateStr);
+          } else {
+            const detailBody = document.getElementById('diary-detail-body');
+            detailBody.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><p>这一天没有日记</p></div>';
+          }
+        });
+
+        grid.appendChild(cell);
+      }
+
+      const remainingCells = 42 - (startDay + totalDays);
+      for (let i = 1; i <= remainingCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell other-month';
+        cell.textContent = i;
+        grid.appendChild(cell);
+      }
+
+      document.getElementById('current-month').textContent = currentYear + '年' + (currentMonth + 1) + '月';
+
+      const yearSelect = document.getElementById('year-select');
+      const monthSelect = document.getElementById('month-select');
+      if (yearSelect && monthSelect) {
+        yearSelect.value = currentYear;
+        monthSelect.value = currentMonth;
+      }
+    }
+
+    function showDiaryDetail(dateStr) {
+      const diary = diaries.find(d => d.dateStr === dateStr);
+      if (diary) {
+        const detailBody = document.getElementById('diary-detail-body');
+        let renderedContent = '';
+        if (typeof window.markdownit !== 'undefined') {
+          const md = new window.markdownit({
+            html: true,
+            linkify: true,
+            typographer: true
+          });
+          renderedContent = md.render(diary.content);
+        } else {
+          renderedContent = '<pre style="white-space: pre-wrap;">' + diary.content + '</pre>';
+        }
+        detailBody.innerHTML = '<div class="detail-date">' + diary.dateStr + '</div><div class="detail-words">共 ' + diary.wordCount + ' 字</div><div class="detail-content">' + renderedContent + '</div>';
+      }
+    }
+
+    function openDiary(dateStr) {
+      const calendarTab = document.querySelector('.tab-btn[data-tab="calendar"]');
+      if (calendarTab && !calendarTab.classList.contains('active')) {
+        calendarTab.click();
+      }
+      
+      const [year, month] = dateStr.split('-').map(Number);
+      currentYear = year;
+      currentMonth = month - 1;
+      renderCalendar();
+      
+      const cells = document.querySelectorAll('.day-cell');
+      cells.forEach(cell => {
+        if (!cell.classList.contains('other-month')) {
+          const dayNum = cell.querySelector('.day-number');
+          if (dayNum && parseInt(dayNum.textContent) === parseInt(dateStr.split('-')[2])) {
+            document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+            cell.classList.add('selected');
+          }
+        }
+      });
+      
+      showDiaryDetail(dateStr);
+    }
+
+    function initSearch() {
+      const input = document.getElementById('search-input');
+      const results = document.getElementById('search-results');
+
+      input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        if (!query) {
+          results.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><p>输入关键词搜索日记</p></div>';
+          return;
+        }
+
+        const filtered = diaries.filter(d => d.content.toLowerCase().includes(query) || d.dateStr.includes(query));
+
+        if (filtered.length === 0) {
+          results.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>没有找到匹配的日记</p></div>';
+        } else {
+          results.innerHTML = filtered.map(d => '<div class="search-card" onclick="openDiary(\'' + d.dateStr + '\')"><div class="search-date">' + d.dateStr + '</div><div class="search-preview">' + d.preview + '</div><div class="preview-words" style="margin-top: 0.5rem;">' + d.wordCount + ' 字</div></div>').join('');
+        }
+      });
+    }
+
+    function initHeaderSearch() {
+      const input = document.getElementById('header-search-input');
+      const results = document.getElementById('header-search-results');
+
+      input.addEventListener('input', () => {
+        const query = input.value.toLowerCase();
+        if (!query) {
+          results.classList.remove('show');
+          results.innerHTML = '';
+          return;
+        }
+
+        const filtered = diaries.filter(d => d.content.toLowerCase().includes(query) || d.dateStr.includes(query));
+
+        if (filtered.length === 0) {
+          results.innerHTML = '<div class="search-card" style="color: #888;">没有找到匹配的日记</div>';
+          results.classList.add('show');
+        } else {
+          results.innerHTML = filtered.map(d => '<div class="search-card" data-date="' + d.dateStr + '"><div class="search-date">' + d.dateStr + '</div><div class="search-preview">' + d.preview + '</div></div>').join('');
+          results.classList.add('show');
+        }
+      });
+
+      results.addEventListener('click', (e) => {
+        const card = e.target.closest('.search-card');
+        if (card) {
+          const dateStr = card.dataset.date;
+          results.classList.remove('show');
+          results.innerHTML = '';
+          openDiary(dateStr);
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+          results.classList.remove('show');
+        }
+      });
+    }
+
+    function initStats() {
+      const totalCount = Object.values(stats.byDate).length;
+      const totalWords = Object.values(stats.byDate).reduce((sum, d) => sum + d.words, 0);
+
+      document.getElementById('total-count').textContent = totalCount;
+      document.getElementById('total-words').textContent = totalWords.toLocaleString();
+      document.getElementById('active-days').textContent = totalCount;
+      document.getElementById('avg-words').textContent = totalCount > 0 ? Math.round(totalWords / totalCount) : 0;
+
+      fullMonthLabels = Object.keys(stats.byMonth).sort();
+      fullMonthCounts = fullMonthLabels.map(m => stats.byMonth[m].count);
+      fullMonthWords = fullMonthLabels.map(m => stats.byMonth[m].words);
+
+      const monthLabels = fullMonthLabels.slice(-60);
+      const monthCounts = monthLabels.map(m => stats.byMonth[m].count);
+      const monthWords = monthLabels.map(m => stats.byMonth[m].words);
+
+      monthlyChart = new Chart(document.getElementById('monthly-chart'), {
+        type: 'line',
+        data: {
+          labels: monthLabels,
+          datasets: [
+            {
+              label: '日记数量',
+              data: monthCounts,
+              borderColor: '#0140ff',
+              backgroundColor: 'rgba(1, 64, 255, 0.15)',
+              borderWidth: 2,
+              tension: 0,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: '字数',
+              data: monthWords,
+              borderColor: '#386aff',
+              backgroundColor: 'rgba(56, 106, 255, 0.15)',
+              borderWidth: 2,
+              tension: 0,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const month = event.chart.data.labels[index];
+              const monthDiaries = diaries.filter(d => d.dateStr.startsWith(month));
+              if (monthDiaries.length > 0) {
+                openDiary(monthDiaries[0].dateStr);
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#111111' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888888', maxRotation: 45, minRotation: 45 },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888888' },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#888888' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      fullWeekLabels = Object.keys(stats.byWeek).sort();
+      fullWeekCounts = fullWeekLabels.map(w => stats.byWeek[w].count);
+      fullWeekWords = fullWeekLabels.map(w => stats.byWeek[w].words);
+
+      const weekLabels = fullWeekLabels.slice(-60);
+      const weekCounts = weekLabels.map(w => stats.byWeek[w].count);
+      const weekWords = weekLabels.map(w => stats.byWeek[w].words);
+
+      weeklyChart = new Chart(document.getElementById('weekly-chart'), {
+        type: 'line',
+        data: {
+          labels: weekLabels,
+          datasets: [
+            {
+              label: '日记数量',
+              data: weekCounts,
+              borderColor: '#0140ff',
+              backgroundColor: 'rgba(1, 64, 255, 0.15)',
+              borderWidth: 2,
+              tension: 0,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            },
+            {
+              label: '字数',
+              data: weekWords,
+              borderColor: '#386aff',
+              backgroundColor: 'rgba(56, 106, 255, 0.15)',
+              borderWidth: 2,
+              tension: 0,
+              fill: true,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const week = event.chart.data.labels[index];
+              const year = week.split('-')[0];
+              const weekNum = parseInt(week.split('W')[1]);
+              const startDate = new Date(year, 0, 1 + (weekNum - 1) * 7);
+              const endDate = new Date(year, 0, 1 + weekNum * 7);
+              const weekDiaries = diaries.filter(d => {
+                const dDate = new Date(d.dateStr);
+                return dDate >= startDate && dDate < endDate;
+              });
+              if (weekDiaries.length > 0) {
+                openDiary(weekDiaries[0].dateStr);
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#111111' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888888', maxRotation: 45, minRotation: 45 },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888888' },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#888888' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      fullYearLabels = Object.keys(stats.byYear).sort();
+      fullYearCounts = fullYearLabels.map(y => stats.byYear[y].count);
+      fullYearWords = fullYearLabels.map(y => stats.byYear[y].words);
+
+      const yearLabels = fullYearLabels.slice(-60);
+      const yearCounts = yearLabels.map(y => stats.byYear[y].count);
+      const yearWords = yearLabels.map(y => stats.byYear[y].words);
+
+      yearlyChart = new Chart(document.getElementById('yearly-chart'), {
+        type: 'line',
+        data: {
+          labels: yearLabels,
+          datasets: [
+            {
+              label: '日记数量',
+              data: yearCounts,
+              borderColor: '#0140ff',
+              backgroundColor: 'rgba(1, 64, 255, 0.15)',
+              tension: 0,
+              fill: true
+            },
+            {
+              label: '字数',
+              data: yearWords,
+              borderColor: '#386aff',
+              backgroundColor: 'rgba(56, 106, 255, 0.15)',
+              tension: 0,
+              fill: true,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const year = event.chart.data.labels[index];
+              const yearDiaries = diaries.filter(d => d.dateStr.startsWith(year));
+              if (yearDiaries.length > 0) {
+                openDiary(yearDiaries[0].dateStr);
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#111111' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888888', maxRotation: 45, minRotation: 45 },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888888' },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            },
+            y1: {
+              position: 'right',
+              ticks: { color: '#888888' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      fullDateLabels = Object.keys(stats.byDate).sort();
+      fullDateWords = fullDateLabels.map(d => stats.byDate[d].words);
+
+      const dateLabels = fullDateLabels.slice(-60);
+      const dateWords = dateLabels.map(d => stats.byDate[d].words);
+
+      dailyChart = new Chart(document.getElementById('daily-chart'), {
+        type: 'line',
+        data: {
+          labels: dateLabels,
+          datasets: [{
+            label: '字数',
+            data: dateWords,
+            borderColor: '#0140ff',
+            backgroundColor: 'rgba(1, 64, 255, 0.15)',
+            borderWidth: 2,
+            tension: 0,
+            fill: true,
+            pointRadius: 3,
+            pointHoverRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (event, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const dateStr = event.chart.data.labels[index];
+              openDiary(dateStr);
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#111111' }
+            },
+            tooltip: {
+              intersect: false,
+              mode: 'index'
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#888888', maxRotation: 45, minRotation: 45 },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#888888' },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' }
+            }
+          }
+        }
+      });
+    }
+
+    function toggleChartRange(chartType) {
+      const btn = document.getElementById('toggle-' + chartType);
+      const showAll = btn.dataset.showAll === 'true';
+      
+      if (chartType === 'monthly') {
+        const labels = showAll ? fullMonthLabels.slice(-60) : fullMonthLabels;
+        const counts = labels.map(m => stats.byMonth[m].count);
+        const words = labels.map(m => stats.byMonth[m].words);
+        monthlyChart.data.labels = labels;
+        monthlyChart.data.datasets[0].data = counts;
+        monthlyChart.data.datasets[1].data = words;
+        monthlyChart.update();
+      } else if (chartType === 'weekly') {
+        const labels = showAll ? fullWeekLabels.slice(-60) : fullWeekLabels;
+        const counts = labels.map(w => stats.byWeek[w].count);
+        const words = labels.map(w => stats.byWeek[w].words);
+        weeklyChart.data.labels = labels;
+        weeklyChart.data.datasets[0].data = counts;
+        weeklyChart.data.datasets[1].data = words;
+        weeklyChart.update();
+      } else if (chartType === 'yearly') {
+        const labels = showAll ? fullYearLabels.slice(-60) : fullYearLabels;
+        const counts = labels.map(y => stats.byYear[y].count);
+        const words = labels.map(y => stats.byYear[y].words);
+        yearlyChart.data.labels = labels;
+        yearlyChart.data.datasets[0].data = counts;
+        yearlyChart.data.datasets[1].data = words;
+        yearlyChart.update();
+      } else if (chartType === 'daily') {
+        const labels = showAll ? fullDateLabels.slice(-60) : fullDateLabels;
+        const words = labels.map(d => stats.byDate[d].words);
+        dailyChart.data.labels = labels;
+        dailyChart.data.datasets[0].data = words;
+        dailyChart.update();
+      }
+      
+      btn.dataset.showAll = !showAll;
+      btn.textContent = showAll ? '显示全部' : '最近60个';
+    }
+
+    document.getElementById('prev-month').addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById('next-month').addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderCalendar();
+    });
+
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('diary-modal').classList.remove('active');
+    });
+
+    document.getElementById('diary-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('diary-modal')) {
+        document.getElementById('diary-modal').classList.remove('active');
+      }
+    });
+
+    initTabs();
+    initYearSelector();
+    renderCalendar();
+    initSearch();
+    initHeaderSearch();
+    initStats();
+  </script>
+</body>
+</html>
