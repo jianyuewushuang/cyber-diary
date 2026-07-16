@@ -1240,7 +1240,6 @@
         const card = e.target.closest('.search-card');
         if (card) {
           const dateStr = card.dataset.date;
-          input.value = '';
           results.classList.remove('show');
           results.innerHTML = '';
           openDiary(dateStr);
