@@ -723,6 +723,12 @@ body.theme-21th {
       width: var(--circle-size, 8px);
       height: var(--circle-size, 8px);
       background: var(--t-accent);
+      opacity: 0.6;
+    }
+
+    body.theme-21th .day-cell.has-diary::after {
+      background: #888888;
+      opacity: 0.8;
     }
 
     .day-cell.selected {
@@ -1340,7 +1346,7 @@ body.theme-21th {
 
         if (diary) {
           cell.classList.add('has-diary');
-          const circleSize = Math.min(6 + diary.wordCount / 20, 40);
+          const circleSize = Math.min(6 + diary.wordCount * 0.017, 40);
           cell.style.setProperty('--circle-size', circleSize + 'px');
 
           const preview = document.createElement('div');
