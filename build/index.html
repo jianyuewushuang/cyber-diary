@@ -1172,6 +1172,23 @@
       if (calendarTab && !calendarTab.classList.contains('active')) {
         calendarTab.click();
       }
+      
+      const [year, month] = dateStr.split('-').map(Number);
+      currentYear = year;
+      currentMonth = month - 1;
+      renderCalendar();
+      
+      const cells = document.querySelectorAll('.day-cell');
+      cells.forEach(cell => {
+        if (!cell.classList.contains('other-month')) {
+          const dayNum = cell.querySelector('.day-number');
+          if (dayNum && parseInt(dayNum.textContent) === parseInt(dateStr.split('-')[2])) {
+            document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+            cell.classList.add('selected');
+          }
+        }
+      });
+      
       showDiaryDetail(dateStr);
     }
 
@@ -1214,8 +1231,19 @@
           results.innerHTML = '<div class="search-card" style="color: #888;">没有找到匹配的日记</div>';
           results.classList.add('show');
         } else {
-          results.innerHTML = filtered.map(d => '<div class="search-card" onclick="openDiary(\'' + d.dateStr + '\')"><div class="search-date">' + d.dateStr + '</div><div class="search-preview">' + d.preview + '</div></div>').join('');
+          results.innerHTML = filtered.map(d => '<div class="search-card" data-date="' + d.dateStr + '"><div class="search-date">' + d.dateStr + '</div><div class="search-preview">' + d.preview + '</div></div>').join('');
           results.classList.add('show');
+        }
+      });
+
+      results.addEventListener('click', (e) => {
+        const card = e.target.closest('.search-card');
+        if (card) {
+          const dateStr = card.dataset.date;
+          input.value = '';
+          results.classList.remove('show');
+          results.innerHTML = '';
+          openDiary(dateStr);
         }
       });
 
