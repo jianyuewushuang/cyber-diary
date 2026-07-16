@@ -1106,7 +1106,7 @@ body.theme-21th {
         <p class="subtitle">Cyber Diary - 你的数字记忆</p>
       </div>
       <div style="display: flex; align-items: center; gap: 1rem;">
-        <button id="theme-toggle" class="tab-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">切换主题</button>
+        <button id="theme-toggle" class="tab-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">21th主题</button>
         <div class="header-search">
           <input type="text" class="search-input" id="header-search-input" placeholder="搜索日记...">
           <div class="header-search-results" id="header-search-results"></div>
@@ -1291,6 +1291,7 @@ body.theme-21th {
     function initTabs() {
       const tabs = document.querySelectorAll('.tab-btn');
       tabs.forEach(tab => {
+        if (!tab.dataset.tab) return;
         tab.addEventListener('click', () => {
           document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
           document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
