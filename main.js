@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, Menu, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, shell, Menu, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -58,10 +58,7 @@ function rebuild() {
   }
 }
 
-ipcMain.handle('rebuild', () => {
-  rebuild();
-  return { success: true };
-});
+
 
 function createWindow() {
   const isDev = !app.isPackaged;
@@ -82,8 +79,7 @@ function createWindow() {
     title: '赛博日记本',
     webPreferences: {
       contextIsolation: true,
-      nodeIntegration: false,
-      preload: path.join(__dirname, 'preload.js')
+      nodeIntegration: false
     }
   });
 
@@ -111,12 +107,16 @@ function createWindow() {
               console.error('选择文件夹失败:', err);
             });
           }
+        },
+        {
+          label: '重新构建',
+          click: () => {
+            rebuild();
+          }
         }
       ]
     }
-  ];
-
-  const menu = Menu.buildFromTemplate(menuTemplate);
+  ];  const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
 }
 
