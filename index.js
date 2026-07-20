@@ -8,7 +8,7 @@ const md = markdownIt({
   typographer: true
 });
 
-const buildDir = path.join(__dirname, 'build');
+const buildDirDefault = path.join(__dirname, 'build');
 
 function getDiaryDir() {
   const argIndex = process.argv.indexOf('--dir');
@@ -163,22 +163,27 @@ function generateHTML(diaries, stats) {
   return template;
 }
 
-function copyResources() {
+function copyResources(buildDir, isDev) {
+  if (!isDev) return;
   const resourcesDir = path.join(__dirname, 'resources');
-  const buildResourcesDir = path.join(buildDir, 'resources');
+  const destDir = path.join(buildDir, 'resources');
 
   if (fs.existsSync(resourcesDir)) {
-    if (fs.existsSync(buildResourcesDir)) {
-      fs.rmSync(buildResourcesDir, { recursive: true });
+    if (fs.existsSync(destDir)) {
+      fs.rmSync(destDir, { recursive: true });
     }
-    fs.cpSync(resourcesDir, buildResourcesDir, { recursive: true });
+    fs.cpSync(resourcesDir, destDir, { recursive: true });
     console.log('resources 文件夹已复制到 build 目录');
   } else {
     console.log('resources 文件夹不存在');
   }
 }
 
-function build(diaryDir) {
+function build(diaryDir, options) {
+  options = options || {};
+  const buildDir = options.buildDir || buildDirDefault;
+  const isDev = options.isDev || false;
+
   if (!fs.existsSync(diaryDir)) {
     console.log('diary 文件夹不存在，正在创建...');
     fs.mkdirSync(diaryDir, { recursive: true });
@@ -198,12 +203,12 @@ function build(diaryDir) {
   fs.writeFileSync(path.join(buildDir, 'index.html'), html);
   console.log('HTML 文件已生成到 build 文件夹');
 
-  copyResources();
+  copyResources(buildDir, isDev);
 }
 
 function main() {
   const diaryDir = getDiaryDir();
-  build(diaryDir);
+  build(diaryDir, { isDev: true });
 }
 
 if (require.main === module) {
