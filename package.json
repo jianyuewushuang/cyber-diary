@@ -2,18 +2,60 @@
   "name": "cyber-diary",
   "version": "1.0.0",
   "description": "赛博日记本 - 可视化日记管理工具",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "build": "node index.js",
-    "dev": "node index.js && npx http-server build -p 8080"
+    "prepare": "node prepare.js",
+    "dev": "npm run build && electron .",
+    "dist": "electron-builder --mac --win --linux"
   },
-  "keywords": ["diary", "journal", "markdown", "cyber"],
+  "postinstall": "npm run prepare",
+  "keywords": [
+    "diary",
+    "journal",
+    "markdown",
+    "cyber"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "markdown-it": "^14.1.0"
+    "markdown-it": "^14.1.0",
+    "chart.js": "^4.4.7"
   },
   "devDependencies": {
+    "electron": "^43.1.1",
+    "electron-builder": "^26.0.12",
     "http-server": "^14.1.1"
+  },
+  "build": {
+    "appId": "com.cyberdiary.app",
+    "productName": "赛博日记本",
+    "asar": true,
+    "asarUnpack": "diary/**/*",
+    "extraResources": [
+      {
+        "from": "diary",
+        "to": "diary"
+      }
+    ],
+    "files": [
+      "main.js",
+      "index.js",
+      "template.html",
+      "prepare.js",
+      "resources/**/*",
+      "libs/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

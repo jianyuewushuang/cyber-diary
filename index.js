@@ -8,8 +8,15 @@ const md = markdownIt({
   typographer: true
 });
 
-const diaryDir = path.join(__dirname, 'diary');
 const buildDir = path.join(__dirname, 'build');
+
+function getDiaryDir() {
+  const argIndex = process.argv.indexOf('--dir');
+  if (argIndex !== -1 && argIndex + 1 < process.argv.length) {
+    return path.resolve(process.argv[argIndex + 1]);
+  }
+  return path.join(__dirname, 'diary');
+}
 
 function parseDateFromFilename(filename) {
   let match = filename.match(/^(\d{4})(\d{2})(\d{2})\.md$/);
@@ -21,7 +28,7 @@ function parseDateFromFilename(filename) {
       dateStr: match[1] + '-' + match[2] + '-' + match[3]
     };
   }
-  
+
   match = filename.match(/^(\d{2})(\d{2})(\d{2})\.md$/);
   if (match) {
     const year = parseInt('20' + match[1]);
@@ -34,11 +41,11 @@ function parseDateFromFilename(filename) {
       dateStr: '20' + match[1] + '-' + match[2] + '-' + match[3]
     };
   }
-  
+
   return null;
 }
 
-function readDiaryFiles() {
+function readDiaryFiles(diaryDir) {
   const files = fs.readdirSync(diaryDir);
   const diaries = [];
 
@@ -149,10 +156,10 @@ function getWeekNumber(dateStr) {
 function generateHTML(diaries, stats) {
   const templatePath = path.join(__dirname, 'template.html');
   let template = fs.readFileSync(templatePath, 'utf-8');
-  
+
   template = template.replace('{{DIARIES_DATA}}', JSON.stringify(diaries));
   template = template.replace('{{STATS_DATA}}', JSON.stringify(stats));
-  
+
   return template;
 }
 
@@ -171,7 +178,7 @@ function copyResources() {
   }
 }
 
-function main() {
+function build(diaryDir) {
   if (!fs.existsSync(diaryDir)) {
     console.log('diary 文件夹不存在，正在创建...');
     fs.mkdirSync(diaryDir, { recursive: true });
@@ -182,7 +189,7 @@ function main() {
     fs.mkdirSync(buildDir, { recursive: true });
   }
 
-  const diaries = readDiaryFiles();
+  const diaries = readDiaryFiles(diaryDir);
   console.log(`找到 ${diaries.length} 篇日记`);
 
   const stats = generateStats(diaries);
@@ -194,4 +201,13 @@ function main() {
   copyResources();
 }
 
-main();
+function main() {
+  const diaryDir = getDiaryDir();
+  build(diaryDir);
+}
+
+if (require.main === module) {
+  main();
+}
+
+module.exports = { build, getDiaryDir };
