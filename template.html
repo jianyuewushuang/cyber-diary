@@ -1116,6 +1116,7 @@ body.theme-21th {
       </div>
       <div style="display: flex; align-items: center; gap: 1rem;">
         <button id="theme-toggle" class="tab-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">回到过去</button>
+        <button id="rebuild-btn" class="tab-btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;">重新构建</button>
         <div class="header-search">
           <input type="text" class="search-input" id="header-search-input" placeholder="搜索日记...">
           <div class="header-search-results" id="header-search-results"></div>
@@ -1926,6 +1927,27 @@ body.theme-21th {
       updateChart(yearlyChart);
       updateChart(dailyChart);
     }
+
+    function initRebuildButton() {
+      const btn = document.getElementById('rebuild-btn');
+      if (!btn) return;
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = '构建中...';
+        try {
+          if (window.electronAPI && window.electronAPI.rebuild) {
+            await window.electronAPI.rebuild();
+          }
+          window.location.reload();
+        } catch (err) {
+          console.error('重新构建失败:', err);
+          btn.textContent = '重新构建';
+          btn.disabled = false;
+        }
+      });
+    }
+
+    initRebuildButton();
   </script>
 </body>
 </html>

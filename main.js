@@ -1,6 +1,10 @@
-const { app, BrowserWindow, shell, Menu } = require('electron');
+const { app, BrowserWindow, shell, Menu, dialog, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+
+let diaryDir;
+let buildDir;
+let win;
 
 function copyDir(src, dest) {
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
@@ -16,23 +20,20 @@ function copyDir(src, dest) {
   }
 }
 
-function createWindow() {
+function rebuild() {
   const isDev = !app.isPackaged;
-  let diaryDir;
-  let buildDir;
 
   if (isDev) {
-    diaryDir = path.join(__dirname, 'diary');
+    if (!diaryDir) diaryDir = path.join(__dirname, 'diary');
     buildDir = path.join(__dirname, 'build');
     require('./index.js').build(diaryDir, { buildDir: buildDir, isDev: true });
   } else {
     const userData = app.getPath('userData');
-    diaryDir = path.join(userData, 'diary');
     buildDir = path.join(userData, 'build');
     const resourcesDir = path.join(userData, 'resources');
     const libsDir = path.join(userData, 'libs');
-
     const packagedDiary = path.join(process.resourcesPath, 'diary');
+
     if (!fs.existsSync(diaryDir) && fs.existsSync(packagedDiary)) {
       fs.cpSync(packagedDiary, diaryDir, { recursive: true, force: false });
     }
@@ -52,7 +53,28 @@ function createWindow() {
     require('./index.js').build(diaryDir, { buildDir: buildDir, isDev: false });
   }
 
-  const win = new BrowserWindow({
+  if (win) {
+    win.webContents.reload();
+  }
+}
+
+ipcMain.handle('rebuild', () => {
+  rebuild();
+  return { success: true };
+});
+
+function createWindow() {
+  const isDev = !app.isPackaged;
+
+  if (isDev) {
+    diaryDir = path.join(__dirname, 'diary');
+  } else {
+    diaryDir = path.join(app.getPath('userData'), 'diary');
+  }
+
+  rebuild();
+
+  win = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 800,
@@ -60,7 +82,8 @@ function createWindow() {
     title: '赛博日记本',
     webPreferences: {
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
@@ -75,9 +98,18 @@ function createWindow() {
       label: '文件',
       submenu: [
         {
-          label: '打开日记文件夹',
+          label: '选择日记文件夹...',
           click: () => {
-            shell.openPath(diaryDir);
+            dialog.showOpenDialog(win, {
+              properties: ['openDirectory']
+            }).then(result => {
+              if (!result.canceled && result.filePaths.length > 0) {
+                diaryDir = result.filePaths[0];
+                rebuild();
+              }
+            }).catch(err => {
+              console.error('选择文件夹失败:', err);
+            });
           }
         }
       ]
