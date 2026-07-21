@@ -6,6 +6,27 @@ let diaryDir;
 let buildDir;
 let win;
 
+function loadConfig() {
+  try {
+    const configPath = path.join(app.getPath('userData'), 'config.json');
+    if (fs.existsSync(configPath)) {
+      return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    }
+  } catch (e) {}
+  return {};
+}
+
+function saveConfig(key, value) {
+  const config = loadConfig();
+  config[key] = value;
+  const userData = app.getPath('userData');
+  if (!fs.existsSync(userData)) {
+    fs.mkdirSync(userData, { recursive: true });
+  }
+  const configPath = path.join(userData, 'config.json');
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
 function copyDir(src, dest) {
   console.log('[copyDir] src:', src);
   console.log('[copyDir] dest:', dest);
@@ -83,13 +104,23 @@ function rebuild() {
 
 
 
-function createWindow() {
+async function createWindow() {
   const isDev = !app.isPackaged;
 
-  if (isDev) {
-    diaryDir = path.join(__dirname, 'diary');
+  const config = loadConfig();
+  if (config.lastDiaryDir && fs.existsSync(config.lastDiaryDir)) {
+    diaryDir = config.lastDiaryDir;
   } else {
-    diaryDir = path.join(app.getPath('userData'), 'diary');
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory'],
+      title: '选择日记文件夹'
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+      diaryDir = result.filePaths[0];
+    } else {
+      diaryDir = isDev ? path.join(__dirname, 'diary') : path.join(app.getPath('userData'), 'diary');
+    }
+    saveConfig('lastDiaryDir', diaryDir);
   }
 
   rebuild();
@@ -124,6 +155,7 @@ function createWindow() {
             }).then(result => {
               if (!result.canceled && result.filePaths.length > 0) {
                 diaryDir = result.filePaths[0];
+                saveConfig('lastDiaryDir', diaryDir);
                 rebuild();
               }
             }).catch(err => {
@@ -143,12 +175,12 @@ function createWindow() {
   Menu.setApplicationMenu(menu);
 }
 
-app.whenReady().then(() => {
-  createWindow();
+app.whenReady().then(async () => {
+  await createWindow();
 
-  app.on('activate', () => {
+  app.on('activate', async () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      await createWindow();
     }
   });
 });
