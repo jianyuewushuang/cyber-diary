@@ -1,6 +1,6 @@
 {
   "name": "cyber-diary",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "description": "赛博日记本 - 可视化日记管理工具",
   "main": "main.js",
   "scripts": {

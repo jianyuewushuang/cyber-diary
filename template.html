@@ -349,6 +349,9 @@ body.theme-21th {
       border: 1px solid var(--t-border);
       height: calc(100vh - 248px);
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     body.theme-21th .calendar-container {
@@ -574,6 +577,7 @@ body.theme-21th {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
+      flex-shrink: 0;
     }
 
     .calendar-nav {
@@ -617,6 +621,7 @@ body.theme-21th {
       justify-content: center;
       gap: 8px;
       margin-bottom: 12px;
+      flex-shrink: 0;
     }
 
     .year-select-input, .month-select-input {
@@ -647,7 +652,10 @@ body.theme-21th {
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: auto repeat(6, 1fr);
       gap: 4px;
+      flex: 1;
+      min-height: 0;
     }
 
     .day-name {
@@ -660,7 +668,8 @@ body.theme-21th {
     }
 
     .day-cell {
-      height: calc((100vh - 440px)/6);
+      height: 100%;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -672,6 +681,8 @@ body.theme-21th {
       padding: 8px;
       border: 1px solid var(--t-border);
       background: var(--t-input);
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
     .day-number {
@@ -695,6 +706,8 @@ body.theme-21th {
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       margin-bottom: 4px;
+      flex: 0 0 auto;
+      max-height: calc(0.65rem * 1.3 * 2);
     }
 
     .day-wordcount {
@@ -703,6 +716,7 @@ body.theme-21th {
       font-weight: 600;
       position: relative;
       z-index: 1;
+      flex: 0 0 auto;
     }
 
     .day-cell:hover {
@@ -1331,7 +1345,10 @@ body.theme-21th {
       for (let i = startDay - 1; i >= 0; i--) {
         const cell = document.createElement('div');
         cell.className = 'day-cell other-month';
-        cell.textContent = prevMonthLastDay - i;
+        const dayNumber = document.createElement('span');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = prevMonthLastDay - i;
+        cell.appendChild(dayNumber);
         grid.appendChild(cell);
       }
 
@@ -1381,7 +1398,10 @@ body.theme-21th {
       for (let i = 1; i <= remainingCells; i++) {
         const cell = document.createElement('div');
         cell.className = 'day-cell other-month';
-        cell.textContent = i;
+        const dayNumber = document.createElement('span');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = i;
+        cell.appendChild(dayNumber);
         grid.appendChild(cell);
       }
 
