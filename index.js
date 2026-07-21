@@ -163,19 +163,35 @@ function generateHTML(diaries, stats) {
   return template;
 }
 
-function copyResources(buildDir, isDev) {
-  if (!isDev) return;
-  const resourcesDir = path.join(__dirname, 'resources');
-  const destDir = path.join(buildDir, 'resources');
+function copyResources(buildDir, diaryDir) {
+  const sourceResourcesDir = path.resolve(path.join(diaryDir, '..', 'resources'));
+  const destResourcesDir = path.resolve(path.join(buildDir, 'resources'));
 
-  if (fs.existsSync(resourcesDir)) {
-    if (fs.existsSync(destDir)) {
-      fs.rmSync(destDir, { recursive: true });
+  console.log('[copyResources] 源目录:', sourceResourcesDir);
+  console.log('[copyResources] 目标目录:', destResourcesDir);
+
+  if (fs.existsSync(sourceResourcesDir)) {
+    if (fs.existsSync(destResourcesDir)) {
+      fs.rmSync(destResourcesDir, { recursive: true });
+      console.log('[copyResources] 已删除旧的目标目录');
     }
-    fs.cpSync(resourcesDir, destDir, { recursive: true });
-    console.log('resources 文件夹已复制到 build 目录');
+    fs.cpSync(sourceResourcesDir, destResourcesDir, { recursive: true });
+    const list = [];
+    walkDir(destResourcesDir, '', list);
+    console.log('[copyResources] 已复制', list.length, '个文件:', list.join(', '));
   } else {
-    console.log('resources 文件夹不存在');
+    console.log('[copyResources] 源目录不存在，跳过复制');
+  }
+}
+
+function walkDir(dir, relative, result) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const relPath = relative + entry.name + (entry.isDirectory() ? '/' : '');
+    result.push(relPath);
+    if (entry.isDirectory()) {
+      walkDir(path.join(dir, entry.name), relative + entry.name + '/', result);
+    }
   }
 }
 
@@ -203,7 +219,7 @@ function build(diaryDir, options) {
   fs.writeFileSync(path.join(buildDir, 'index.html'), html);
   console.log('HTML 文件已生成到 build 文件夹');
 
-  copyResources(buildDir, isDev);
+  copyResources(buildDir, diaryDir);
 }
 
 function main() {

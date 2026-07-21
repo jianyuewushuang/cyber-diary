@@ -7,12 +7,15 @@ let buildDir;
 let win;
 
 function copyDir(src, dest) {
+  console.log('[copyDir] src:', src);
+  console.log('[copyDir] dest:', dest);
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-  const entries = fs.readdirSync(src, { withFileTypes: true });
+  const entries = fs.readdirSync(src);
+  console.log('[copyDir] entries:', entries.length, entries);
   for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
+    const srcPath = path.join(src, entry);
+    const destPath = path.join(dest, entry);
+    if (fs.statSync(srcPath).isDirectory()) {
       copyDir(srcPath, destPath);
     } else {
       fs.copyFileSync(srcPath, destPath);
@@ -23,23 +26,31 @@ function copyDir(src, dest) {
 function rebuild() {
   const isDev = !app.isPackaged;
 
+  console.log('[rebuild] diaryDir:', diaryDir);
+  console.log('[rebuild] isDev:', isDev);
+
   if (isDev) {
     if (!diaryDir) diaryDir = path.join(__dirname, 'diary');
     buildDir = path.join(__dirname, 'build');
+    console.log('[rebuild] buildDir:', buildDir);
     require('./index.js').build(diaryDir, { buildDir: buildDir, isDev: true });
   } else {
     const userData = app.getPath('userData');
     buildDir = path.join(userData, 'build');
-    const resourcesDir = path.join(userData, 'resources');
     const libsDir = path.join(userData, 'libs');
+    const defaultResourcesDir = path.join(userData, 'resources');
     const packagedDiary = path.join(process.resourcesPath, 'diary');
+
+    console.log('[rebuild] buildDir:', buildDir);
+    console.log('[rebuild] defaultResourcesDir:', defaultResourcesDir);
 
     if (!fs.existsSync(diaryDir) && fs.existsSync(packagedDiary)) {
       fs.cpSync(packagedDiary, diaryDir, { recursive: true, force: false });
     }
 
-    if (!fs.existsSync(resourcesDir)) {
-      copyDir(path.join(__dirname, 'resources'), resourcesDir);
+    if (!fs.existsSync(defaultResourcesDir)) {
+      console.log('[rebuild] 首次启动，从 asar 初始化 resources');
+      copyDir(path.join(__dirname, 'resources'), defaultResourcesDir);
     }
 
     if (!fs.existsSync(libsDir)) {
@@ -51,10 +62,22 @@ function rebuild() {
     }
 
     require('./index.js').build(diaryDir, { buildDir: buildDir, isDev: false });
+
+    const sourceResourcesDir = path.resolve(path.join(diaryDir, '..', 'resources'));
+    if (fs.existsSync(sourceResourcesDir)) {
+      if (fs.existsSync(defaultResourcesDir)) {
+        fs.rmSync(defaultResourcesDir, { recursive: true, force: true });
+      }
+      copyDir(sourceResourcesDir, defaultResourcesDir);
+      console.log('[rebuild] 已用新 resources 覆盖 userData/resources');
+    } else {
+      console.log('[rebuild] 当前 diaryDir 同级无 resources 目录，保留现有 userData/resources');
+    }
   }
 
   if (win) {
-    win.webContents.reload();
+    console.log('[rebuild] 重新加载页面:', path.join(buildDir, 'index.html'));
+    win.loadFile(path.join(buildDir, 'index.html'));
   }
 }
 
