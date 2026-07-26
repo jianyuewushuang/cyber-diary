@@ -54,7 +54,8 @@ function readDiaryFiles(diaryDir) {
     if (dateInfo) {
       const filePath = path.join(diaryDir, file);
       const content = fs.readFileSync(filePath, 'utf-8');
-      const htmlContent = md.render(content);
+      let htmlContent = md.render(content);
+      htmlContent = htmlContent.replaceAll('"../resources/', '"resources/');
       const wordCount = content.length;
       const preview = content.substring(0, 200) + (content.length > 200 ? '...' : '');
 

@@ -128,7 +128,7 @@ npm run dev
 3. 将选择的路径写入配置文件（下次启动自动恢复）
 4. 刷新页面显示新的日记内容
 
-图片路径约定：日记文件中使用相对路径引用与同级目录下的资源，例如 `![照片](resources/photo.jpg)`，构建时 `resources/` 会被整体复制到构建输出目录。
+图片路径约定：日记文件中可以使用 `resources/xxx.jpg` 或 `../resources/xxx.jpg` 两种方式引用同级目录下的资源，构建时会自动将路径统一处理为正确的相对位置。
 
 ### 首次启动与文件夹记忆
 
@@ -182,14 +182,14 @@ npm run dist
 
 ### 生产环境数据目录
 
-打包应用首次启动时，会在用户数据目录自动初始化：
+打包应用只在 `userData` 存放构建产物和第三方库，不复制日记文件和资源：
 
 | 路径 | 内容 | 来源 |
 |------|------|------|
-| `app.getPath('userData')/diary/` | 日记 Markdown 文件 | 首次从打包资源复制 |
-| `app.getPath('userData')/resources/` | 日记引用的静态资源（图片等） | 首次从 asar 复制，之后每次构建从 `diaryDir` 同级 `resources/` 覆盖 |
 | `app.getPath('userData')/build/` | 构建输出的 `index.html` | 每次构建生成 |
 | `app.getPath('userData')/libs/` | Chart.js 等第三方库 | 首次从 asar 复制 |
+
+日记文件和资源（图片等）直接从用户选择的文件夹读取，每次构建时重新读取，不复制到 `userData`。
 
 在 Linux 上，`userData` 默认为 `~/.config/cyber-diary/`。
 
@@ -200,8 +200,7 @@ npm run dist
 1. `main.js` 调用 `index.js.build(diaryDir, { buildDir })`
 2. 读取 `diaryDir` 下的所有 `.md` 文件，渲染为 HTML
 3. 从 `diaryDir/../resources/` 复制资源到 `build/resources/`
-4. 用 `diaryDir/../resources/` 覆盖 `userData/resources/`
-5. 窗口加载新的 `build/index.html`
+4. 窗口加载新的 `build/index.html`
 
 > **注意**：`resources/` 和 `diary/` 必须始终同级。无论选择哪个文件夹作为日记源，其上级目录中的 `resources/` 都会被同步到构建输出。支持任意层级的子目录嵌套。
 
@@ -279,7 +278,7 @@ yyMMdd.md
 A：修改 `diary/` 文件夹中的 Markdown 文件后，重新运行 `npm run build` 或重启应用即可更新。
 
 ### Q：打包后日记数据存在哪里？
-A：首次启动时从打包资源复制到 `app.getPath('userData')/diary`，之后该目录完全由用户控制，更新版本时不会被覆盖。完整的生产环境目录结构请见[生产环境数据目录](#生产环境数据目录)。
+A：日记文件和资源（图片等）**不复制到 `userData`**，直接从你选择的文件夹读取。`userData` 下只存放构建产物（`build/`）和 Chart.js 等第三方库（`libs/`）。完整的目录结构请见[生产环境数据目录](#生产环境数据目录)。
 
 ### Q：如何更换日记文件夹？
 A：在菜单栏点击 **文件 → 选择日记文件夹...**，选择任意包含 `.md` 日记文件的目录。系统会自动重新构建并刷新页面。每次更换都会同步该目录同级的 `resources/` 资源。选择后路径会被记忆，下次启动自动恢复。
@@ -288,7 +287,7 @@ A：在菜单栏点击 **文件 → 选择日记文件夹...**，选择任意包
 A：可以。每次通过 **文件 → 选择日记文件夹...** 切换即可。应用会记住最后使用的路径，下次启动时自动加载。可以通过修改 `~/.config/cyber-diary/config.json` 中的 `lastDiaryDir` 字段手动指定。
 
 ### Q：日记中的图片如何引用？
-A：使用相对路径引用同级 `resources/` 目录中的文件，例如 `![照片](resources/photo.jpg)`。支持任意层级的子目录嵌套，例如 `![图标](resources/images/icons/star.png)` 也会被正确复制到构建输出。
+A：使用相对路径引用同级 `resources/` 目录中的文件，例如 `![照片](resources/photo.jpg)` 或 `![照片](../resources/photo.jpg)` 均可。支持任意层级的子目录嵌套，例如 `![图标](resources/images/icons/star.png)` 也会被正确复制到构建输出。
 
 ### Q：为什么某些日期没有显示？
 A：系统会自动填充第一篇和最后一篇日记之间的所有日期。如果日期超出这个范围，则不会显示。
@@ -315,7 +314,7 @@ cyber-diary/
 ├── package.json       # 项目配置 + electron-builder 配置
 ├── diary/             # 日记文件存放目录（开发环境）
 ├── resources/         # 静态资源（图片等，与 diary/ 同级）
-├── build/             # 生成的 HTML 文件（git-tracked）
+├── build/             # 生成的 HTML 文件（git-ignored）
 │   ├── index.html     # 构建输出
 │   └── resources/     # 复制自 resources/
 ├── libs/              # 本地第三方库
@@ -328,14 +327,14 @@ cyber-diary/
 ```
 ~/.config/cyber-diary/
 ├── config.json         # 配置信息（最近使用的日记文件夹路径）
-├── diary/              # 日记文件（可从菜单切换）
-├── resources/          # 当前日记文件夹同级的资源（每次构建同步）
 ├── build/
 │   ├── index.html      # 构建输出
-│   └── resources/      # 复制自 resources/
+│   └── resources/      # 复制自 diaryDir/../resources/
 └── libs/
     └── chart.min.js
 ```
+
+日记文件和资源（图片等）**不复制到 `userData`**，直接从用户选择的文件夹读取。
 
 ---
 
@@ -351,14 +350,13 @@ cyber-diary/
 生产模式（菜单选择文件夹）：
   任意文件夹/*.md                 → main.js 调用 index.js.build()     → userData/build/index.html
   任意文件夹/../resources/        → 从 diaryDir 同级复制              → userData/build/resources/
-                                   → 覆盖 userData/resources/（保持一致性）
 ```
 
 `template.html` 中的 `{{DIARIES_DATA}}` 和 `{{STATS_DATA}}` 在构建时被替换为 JSON 数据。
 
 ### 重要约束
 
-- `build/index.html` 与 `build/resources/` 是 **git-tracked** 产物，修改 `template.html` 或 JS 后需运行 `npm run build` 再提交
+- `build/` 已被 `.gitignore` 忽略，修改 `template.html` 或 JS 后需运行 `npm run build` 再提交
 - `diary/*.md` 内容不得删除或修改（除非明确要求）
 - `template.html` 中 Chart.js 必须保持本地路径 `../libs/chart.min.js`，不得改回 CDN
 - 不要添加框架、bundler 或 transpiler（除非明确要求）

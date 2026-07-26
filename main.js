@@ -59,20 +59,6 @@ function rebuild() {
     const userData = app.getPath('userData');
     buildDir = path.join(userData, 'build');
     const libsDir = path.join(userData, 'libs');
-    const defaultResourcesDir = path.join(userData, 'resources');
-    const packagedDiary = path.join(process.resourcesPath, 'diary');
-
-    console.log('[rebuild] buildDir:', buildDir);
-    console.log('[rebuild] defaultResourcesDir:', defaultResourcesDir);
-
-    if (!fs.existsSync(diaryDir) && fs.existsSync(packagedDiary)) {
-      fs.cpSync(packagedDiary, diaryDir, { recursive: true, force: false });
-    }
-
-    if (!fs.existsSync(defaultResourcesDir)) {
-      console.log('[rebuild] 首次启动，从 asar 初始化 resources');
-      copyDir(path.join(__dirname, 'resources'), defaultResourcesDir);
-    }
 
     if (!fs.existsSync(libsDir)) {
       copyDir(path.join(__dirname, 'libs'), libsDir);
@@ -83,17 +69,6 @@ function rebuild() {
     }
 
     require('./index.js').build(diaryDir, { buildDir: buildDir, isDev: false });
-
-    const sourceResourcesDir = path.resolve(path.join(diaryDir, '..', 'resources'));
-    if (fs.existsSync(sourceResourcesDir)) {
-      if (fs.existsSync(defaultResourcesDir)) {
-        fs.rmSync(defaultResourcesDir, { recursive: true, force: true });
-      }
-      copyDir(sourceResourcesDir, defaultResourcesDir);
-      console.log('[rebuild] 已用新 resources 覆盖 userData/resources');
-    } else {
-      console.log('[rebuild] 当前 diaryDir 同级无 resources 目录，保留现有 userData/resources');
-    }
   }
 
   if (win) {
@@ -117,8 +92,11 @@ async function createWindow() {
     });
     if (!result.canceled && result.filePaths.length > 0) {
       diaryDir = result.filePaths[0];
+    } else if (isDev) {
+      diaryDir = path.join(__dirname, 'diary');
     } else {
-      diaryDir = isDev ? path.join(__dirname, 'diary') : path.join(app.getPath('userData'), 'diary');
+      app.quit();
+      return;
     }
     saveConfig('lastDiaryDir', diaryDir);
   }
