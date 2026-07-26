@@ -364,3 +364,13 @@ cyber-diary/
 - 不要添加框架、bundler 或 transpiler（除非明确要求）
 - `resources/` 始终与 `diary/` 同级，构建时会自动同步到构建输出
 - 生产环境菜单栏提供「选择日记文件夹...」和「重新构建」功能，无需修改配置文件
+
+## License
+
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
+
+- Free for personal study, hobby, academic research, non-profit & government organizations.
+- **Commercial use, corporate internal production deployment, paid SaaS, commercial bundling are strictly prohibited.**
+- If you need commercial licensing, contact: <jianyuewushuang@163.com>.
+
+See the full legal terms in [LICENSE](./LICENSE).
