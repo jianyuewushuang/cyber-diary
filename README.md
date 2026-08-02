@@ -2,11 +2,9 @@
 
 一个基于 Electron 的本地可视化日记管理桌面应用，将 Markdown 格式的日记文件转换为精美的交互式网页，支持日历视图、全文搜索和数据统计功能。所有数据存储在本地，无需联网，完全掌控你的日记文件。
 
-![日历视图](./resources/1.jpg)
+![现代](./resources/1.png)
 
-![搜索](./resources/2.jpg)
-
-![数据统计](./resources/3.png)
+![复古](./resources/2.png)
 
 ---
 
