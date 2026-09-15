@@ -7,7 +7,7 @@
     "build": "node index.js",
     "prepare": "node prepare.js",
     "dev": "npm run build && electron .",
-    "dist": "electron-builder --mac --win --linux"
+    "dist": "electron-builder --win --linux"
   },
   "postinstall": "npm run prepare",
   "keywords": [
