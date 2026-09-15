@@ -31,13 +31,6 @@
     "appId": "com.cyberdiary.app",
     "productName": "赛博日记本",
     "asar": true,
-    "asarUnpack": "diary/**/*",
-    "extraResources": [
-      {
-        "from": "diary",
-        "to": "diary"
-      }
-    ],
     "files": [
       "main.js",
       "index.js",
