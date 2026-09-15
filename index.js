@@ -55,8 +55,7 @@ function readDiaryFiles(diaryDir) {
       const filePath = path.join(diaryDir, file);
       const content = fs.readFileSync(filePath, 'utf-8');
       let htmlContent = md.render(content);
-      htmlContent = htmlContent.replaceAll('"../resources/', '"resources/');
-      const wordCount = content.length;
+      htmlContent = htmlContent.replaceAll('"../resources/', '"resources/');      const wordCount = content.length;
       const preview = content.substring(0, 200) + (content.length > 200 ? '...' : '');
 
       diaries.push({
@@ -158,8 +157,12 @@ function generateHTML(diaries, stats) {
   const templatePath = path.join(__dirname, 'template.html');
   let template = fs.readFileSync(templatePath, 'utf-8');
 
-  template = template.replace('{{DIARIES_DATA}}', JSON.stringify(diaries));
-  template = template.replace('{{STATS_DATA}}', JSON.stringify(stats));
+  // 使用函数替换避免 $ 被当作特殊替换模式；同时转义 < 防止内容中的 </script> 提前关闭脚本标签
+  const diariesJson = JSON.stringify(diaries).replace(/</g, '\\u003c');
+  const statsJson = JSON.stringify(stats).replace(/</g, '\\u003c');
+
+  template = template.replace('{{DIARIES_DATA}}', () => diariesJson);
+  template = template.replace('{{STATS_DATA}}', () => statsJson);
 
   return template;
 }
