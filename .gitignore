@@ -3,3 +3,4 @@ dist/
 node_modules/
 package-lock.json
 libs/chart.min.js
+.kilo/
